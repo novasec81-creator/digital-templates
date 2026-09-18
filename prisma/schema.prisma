@@ -1,0 +1,173 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+model User {
+  id               String   @id @default(cuid())
+  email            String   @unique
+  passwordHash     String?
+  name             String?
+  stripeCustomerId String?  @unique
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  orders          Order[]
+  reviews         Review[]
+  affiliateLinks  AffiliateLink[]
+}
+
+model Category {
+  id       String    @id @default(cuid())
+  name     String
+  slug     String    @unique
+  sortOrder Int      @default(0)
+  products Product[]
+}
+
+model Product {
+  id                 String   @id @default(cuid())
+  slug               String   @unique
+  title              String
+  description        String
+  priceCents         Int
+  compareAtPriceCents Int?
+  fileKey            String
+  previewImages      String[]
+  categoryId         String
+  category           Category @relation(fields: [categoryId], references: [id])
+  isActive           Boolean  @default(true)
+  isBundle           Boolean  @default(false)
+  sortOrder          Int      @default(0)
+  downloadCount      Int      @default(0)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  orderItems OrderItem[]
+  reviews    Review[]
+
+  @@index([categoryId, isActive])
+  @@index([isActive, createdAt])
+}
+
+model Order {
+  id                    String      @id @default(cuid())
+  userId                String?
+  user                  User?       @relation(fields: [userId], references: [id])
+  email                 String
+  stripeSessionId       String?     @unique
+  stripePaymentIntentId String?     @unique
+  status                OrderStatus @default(PENDING)
+  totalCents            Int
+  discountCents         Int         @default(0)
+  promoCode             String?
+  affiliateCode         String?
+  createdAt             DateTime    @default(now())
+
+  items          OrderItem[]
+
+  @@index([userId, createdAt])
+  @@index([email, createdAt])
+}
+
+model OrderItem {
+  id         String @id @default(cuid())
+  orderId    String
+  order      Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId  String
+  product    Product @relation(fields: [productId], references: [id])
+  priceCents Int
+  quantity   Int    @default(1)
+
+  tokens DownloadToken[]
+
+  @@index([orderId])
+}
+
+model DownloadToken {
+  id              String    @id @default(cuid())
+  orderItemId     String
+  orderItem       OrderItem @relation(fields: [orderItemId], references: [id], onDelete: Cascade)
+  token           String    @unique
+  expiresAt       DateTime
+downloadCount    Int       @default(0)
+  maxDownloads     Int       @default(5)
+  lastDownloadAt   DateTime?
+  createdAt        DateTime  @default(now())
+
+  downloadLogs DownloadLog[]
+
+  @@index([token])
+}
+
+model Review {
+  id         String   @id @default(cuid())
+  productId  String
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  userId     String?
+  user       User?    @relation(fields: [userId], references: [id])
+  authorName String
+  rating     Int
+  content    String
+  isApproved Boolean  @default(false)
+  isVerified Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  @@index([productId, isApproved])
+}
+
+model PromoCode {
+  id              String    @id @default(cuid())
+  code            String    @unique
+  discountPercent Int?
+  discountCents   Int?     
+  isActive        Boolean   @default(true)
+  maxUses         Int?
+  usedCount       Int       @default(0)
+  expiresAt       DateTime?
+  createdAt       DateTime  @default(now())
+}
+
+model AffiliateLink {
+  id                String   @id @default(cuid())
+  userId            String
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  code              String   @unique
+  commissionPercent Int      @default(20)
+  clicks            Int      @default(0)
+  sales             Int      @default(0)
+  createdAt         DateTime @default(now())
+}
+
+model LoginRequest {
+  id        String    @id @default(cuid())
+  email     String
+  token     String    @unique
+  expiresAt DateTime
+  used      Boolean   @default(false)
+  createdAt DateTime  @default(now())
+
+  @@index([email])
+}
+
+model DownloadLog {
+  id            String   @id @default(cuid())
+  tokenId       String
+  downloadToken DownloadToken @relation(fields: [tokenId], references: [id], onDelete: Cascade)
+  ip            String?
+  userAgent     String?
+  createdAt     DateTime @default(now())
+
+  @@index([tokenId])
+}

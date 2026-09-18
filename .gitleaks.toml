@@ -1,0 +1,15 @@
+# Gitleaks configuration for secret scanning
+# Usage: gitleaks detect --config .gitleaks.toml
+
+title = "digital-templates secret scan"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Intentional test/dev placeholders and example values"
+regexes = [
+  '''change-me''',
+  '''dummy''',
+  '''exemple?\.fr''',
+]
