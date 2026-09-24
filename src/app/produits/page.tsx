@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     "Tous nos templates numériques : Notion, Excel/Google Sheets, presets Lightroom, Canva, CV.",
 };
 
-export const revalidate = 3600;
+export const dynamic = "force-dynamic";
 
 const SORT_OPTIONS = [
   { value: "popularite", label: "Popularité" },

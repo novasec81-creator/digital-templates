@@ -11,15 +11,7 @@ import { ReviewForm } from "@/components/shop/ReviewForm";
 import { price } from "@/lib/constants";
 import { getSessionUser } from "@/lib/auth";
 
-export const revalidate = 3600;
-
-export async function generateStaticParams() {
-  const products = await prisma.product.findMany({
-    where: { isActive: true },
-    select: { slug: true },
-  });
-  return products.map((p) => ({ slug: p.slug }));
-}
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({
   params,

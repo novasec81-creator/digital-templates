@@ -10,7 +10,7 @@ export const metadata: Metadata = {
     "Templates Notion, Excel, Canva, presets Lightroom et modèles de CV — téléchargement immédiat après paiement.",
 };
 
-export const revalidate = 3600;
+export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
   const featured = await prisma.product.findMany({
