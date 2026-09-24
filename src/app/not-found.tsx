@@ -12,7 +12,7 @@ export default function NotFound() {
         href="/produits"
         className="mt-8 inline-block rounded-md bg-gray-900 px-6 py-3 text-sm font-semibold text-white hover:bg-gray-800"
       >
-        Voir la boutique
+        Voir les templates
       </Link>
     </div>
   );

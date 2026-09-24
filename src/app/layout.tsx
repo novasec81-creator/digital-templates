@@ -3,7 +3,6 @@ import { Geist } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
-import { CartProvider } from "@/components/providers/CartProvider";
 import { CookieConsentBanner } from "@/components/providers/CookieConsent";
 import { TrackingSetup } from "@/components/providers/TrackingSetup";
 import { STORE_NAME, STORE_SLOGAN } from "@/lib/constants";
@@ -41,13 +40,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="fr" className={`${geist.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col bg-white text-gray-900">
-        <CartProvider>
-          <Navbar />
-          <main className="flex-1">{children}</main>
-          <Footer />
-          <CookieConsentBanner />
-          <TrackingSetup />
-        </CartProvider>
+        <Navbar />
+        <main className="flex-1">{children}</main>
+        <Footer />
+        <CookieConsentBanner />
+        <TrackingSetup />
       </body>
     </html>
   );

@@ -8,11 +8,11 @@ export function Footer() {
         <div>
           <p className="font-semibold text-gray-900">{STORE_NAME}</p>
           <p className="mt-2 text-gray-600">
-            Des templates numériques premium, livrés instantanément après paiement.
+            Des templates numériques premium, prêts à l&apos;emploi et livrés immédiatement.
           </p>
         </div>
         <div>
-          <p className="font-semibold text-gray-900">Boutique</p>
+          <p className="font-semibold text-gray-900">Templates</p>
           <ul className="mt-2 space-y-1.5">
             <li>
               <Link href="/produits" className="text-gray-600 hover:text-gray-900">
@@ -20,18 +20,18 @@ export function Footer() {
               </Link>
             </li>
             <li>
-              <Link href="/produits?categorie=notion" className="text-gray-600 hover:text-gray-900">
+              <Link href="/produits" className="text-gray-600 hover:text-gray-900">
                 Templates Notion
               </Link>
             </li>
             <li>
-              <Link href="/mes-achats" className="text-gray-600 hover:text-gray-900">
-                Mes achats
+              <Link href="/a-propos" className="text-gray-600 hover:text-gray-900">
+                À propos
               </Link>
             </li>
             <li>
-              <Link href="/connexion" className="text-gray-600 hover:text-gray-900">
-                Connexion
+              <Link href="/contact" className="text-gray-600 hover:text-gray-900">
+                Contact
               </Link>
             </li>
           </ul>

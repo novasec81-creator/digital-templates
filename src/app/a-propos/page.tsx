@@ -14,12 +14,12 @@ export default function AboutPage() {
           plus.
         </p>
         <p>
-          Chaque template est conçu une seule fois puis vendu sans limite : vous
+          Chaque template est conçu une seule fois puis proposé sans limite : vous
           investissez quelques euros, vous gagnez des heures, chaque jour.
         </p>
         <p>
-          La livraison est immédiate et entièrement automatisée : payez, recevez votre
-          email avec le lien de téléchargement et la facture en quelques secondes.
+          La livraison est immédiate et entièrement automatisée : contactez-nous et
+          recevez votre template en quelques minutes.
         </p>
         <p>
           Une question ou une idée de template ?{" "}

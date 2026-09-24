@@ -1,7 +1,9 @@
 import type { MetadataRoute } from "next";
-import { prisma } from "@/lib/db";
+import { DEMO_PRODUCTS } from "@/lib/demo-data";
 
-export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+export const dynamic = "force-static";
+
+export default function sitemap(): MetadataRoute.Sitemap {
   const base = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 
   const staticRoutes: MetadataRoute.Sitemap = [
@@ -14,20 +16,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${base}/confidentialite`, changeFrequency: "yearly", priority: 0.2 },
   ];
 
-  let productRoutes: MetadataRoute.Sitemap = [];
-  try {
-    const products = await prisma.product.findMany({
-      where: { isActive: true },
-      select: {
-        slug: true,
-        updatedAt: true,
-        previewImages: true,
-        reviews: { where: { isApproved: true }, select: { rating: true } },
-      },
-      take: 1000,
-    });
-    productRoutes = products.map((p) => ({ url: `${base}/produits/${p.slug}`, lastModified: p.updatedAt, changeFrequency: "weekly", priority: 0.8 }));
-  } catch {}
+  const productRoutes: MetadataRoute.Sitemap = DEMO_PRODUCTS.map((p) => ({
+    url: `${base}/produits/${p.slug}`,
+    changeFrequency: "weekly",
+    priority: 0.8,
+  }));
 
   return [...staticRoutes, ...productRoutes];
 }

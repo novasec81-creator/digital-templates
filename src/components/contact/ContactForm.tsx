@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { contactSchema } from "@/lib/validations";
+import { STORE_LEGAL } from "@/lib/constants";
 
 export function ContactForm() {
   const [state, setState] = useState({
@@ -10,16 +11,15 @@ export function ContactForm() {
     subject: "",
     message: "",
   });
-  const [status, setStatus] = useState<"idle" | "loading" | "sent" | "error">("idle");
+  const [status, setStatus] = useState<"idle" | "sent" | "error">("idle");
   const [error, setError] = useState("");
 
   function update<K extends keyof typeof state>(key: K, value: string) {
     setState((s) => ({ ...s, [key]: value }));
   }
 
-  async function submit(e: React.FormEvent) {
+  function submit(e: React.FormEvent) {
     e.preventDefault();
-    setStatus("loading");
     setError("");
 
     const parsed = contactSchema.safeParse(state);
@@ -29,24 +29,26 @@ export function ContactForm() {
       return;
     }
 
-    const res = await fetch("/api/contact", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(parsed.data),
-    });
-    if (!res.ok) {
-      const data = (await res.json().catch(() => null)) as { error?: string } | null;
-      setError(data?.error ?? "Une erreur est survenue.");
-      setStatus("error");
-      return;
-    }
+    const subject = `[Templates Store] ${parsed.data.subject || "Contact"}`;
+    const body = [
+      `Nom : ${parsed.data.name}`,
+      `Email : ${parsed.data.email}`,
+      "",
+      parsed.data.message,
+    ].join("\n");
+
+    const mailto = `mailto:${STORE_LEGAL.email}?subject=${encodeURIComponent(
+      subject
+    )}&body=${encodeURIComponent(body)}`;
+    window.location.href = mailto;
     setStatus("sent");
   }
 
   if (status === "sent") {
     return (
       <div className="rounded-lg border border-green-200 bg-green-50 p-4 text-sm text-green-800">
-        Merci ! Votre message a bien été envoyé.
+        Votre client email s&apos;est ouvert avec votre message pré-rempli. Merci de
+        l&apos;envoyer pour nous contacter.
       </div>
     );
   }
@@ -92,10 +94,9 @@ export function ContactForm() {
       {error && <p className="text-sm text-red-600">{error}</p>}
       <button
         type="submit"
-        disabled={status === "loading"}
-        className="rounded-md bg-gray-900 px-6 py-3 text-sm font-semibold text-white hover:bg-gray-800 disabled:opacity-50"
+        className="rounded-md bg-gray-900 px-6 py-3 text-sm font-semibold text-white hover:bg-gray-800"
       >
-        {status === "loading" ? "Envoi…" : "Envoyer"}
+        Envoyer
       </button>
     </form>
   );
