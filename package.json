@@ -6,6 +6,12 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "build:worker": "opennextjs-cloudflare build",
+    "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
+    "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
+    "upload": "opennextjs-cloudflare build && opennextjs-cloudflare upload",
+    "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
+    "postinstall": "prisma generate",
     "lint": "eslint",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -17,6 +23,8 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1134.0",
     "@aws-sdk/s3-request-presigner": "^3.1134.0",
+    "@opennextjs/cloudflare": "^1.20.6",
+    "@prisma/adapter-pg": "^6.19.3",
     "@prisma/client": "6.19.3",
     "@react-email/components": "^1.0.12",
     "@upstash/ratelimit": "^2.1.0",
@@ -44,9 +52,19 @@
     "tailwindcss": "^4",
     "tsx": "^4.23.13",
     "typescript": "^5",
-    "vitest": "^4.1.11"
+    "vitest": "^4.1.11",
+    "wrangler": "^4.138.0"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
+  },
+  "allowScripts": {
+    "esbuild@0.25.4": true,
+    "esbuild@0.28.2": true,
+    "esbuild@0.28.1": true,
+    "@prisma/client@6.19.3": true,
+    "@prisma/engines@6.19.3": true,
+    "prisma@6.19.3": true,
+    "workerd@1.20260921.1": true
   }
 }

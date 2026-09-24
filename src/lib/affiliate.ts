@@ -1,8 +1,11 @@
 import { prisma } from "@/lib/db";
 
-export const AFFILIATE_COOKIE = "aff";
-export const AFFILIATE_CLICKED_COOKIE = "aff_clicked";
-export const AFFILIATE_TTL_SECONDS = 60 * 60 * 24 * 30; // 30 days
+export {
+  AFFILIATE_COOKIE,
+  AFFILIATE_CLICKED_COOKIE,
+  AFFILIATE_TTL_SECONDS,
+  isAffiliateCodeSafe,
+} from "./affiliate-shared";
 
 /**
  * Records a click on an affiliate link, at most once per visitor (guarded by a
@@ -22,8 +25,4 @@ export async function recordAffiliateClick(
   if (!result) return false;
   console.log(`[affiliate] click recorded for "${code}"`);
   return true;
-}
-
-export function isAffiliateCodeSafe(code: string): boolean {
-  return /^[a-z0-9_-]{3,40}$/i.test(code);
 }

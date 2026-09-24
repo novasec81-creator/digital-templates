@@ -3,7 +3,7 @@ import {
   AFFILIATE_COOKIE,
   AFFILIATE_TTL_SECONDS,
   isAffiliateCodeSafe,
-} from "@/lib/affiliate";
+} from "@/lib/affiliate-shared";
 
 /**
  * When a visitor lands with ?ref=CODE, persist the affiliate code in a cookie
