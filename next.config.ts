@@ -32,7 +32,7 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   output: "standalone",
-  serverExternalPackages: ["@prisma/client", ".prisma/client"],
+  serverExternalPackages: ["@prisma/client", ".prisma/client", "pg", "pg-cloudflare"],
   async headers() {
     return [{ source: "/(.*)", headers: securityHeaders }];
   },
