@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-const CONSENT_COOKIE = "cookie_consent";
+const CONSENT_COOKIE = "format_consent";
 
 type ConsentValue = "accepted" | "refused";
 
@@ -15,9 +15,10 @@ export function getConsent(): ConsentValue | null {
 }
 
 /**
- * EU-compliant cookie banner : the refusal option is as easy as acceptance.
- * Third-party scripts stay blocked until the visitor accepts. Strictly
- * necessary cookies (cart, session, affiliate) are exempt from consent.
+ * Bandeau de consentement aux cookies. Il n'est monté que si un outil de
+ * mesure d'audience est configuré (ANALYTICS_CONFIGURED) : sans outils,
+ * aucun cookie n'est posé et aucune bannière n'est affichée. Le refus est
+ * aussi simple que l'acceptation, le choix est conservé 1 an.
  */
 export function CookieConsentBanner() {
   const [visible, setVisible] = useState(false);
@@ -47,13 +48,16 @@ export function CookieConsentBanner() {
     <div
       role="dialog"
       aria-label="Consentement aux cookies"
-      className="fixed inset-x-0 bottom-0 z-50 border-t border-gray-200 bg-white p-4 shadow-lg"
+      className="fixed inset-x-0 bottom-0 z-50 border-t border-line bg-paper p-4 shadow-float"
     >
       <div className="mx-auto flex max-w-4xl flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-sm text-gray-700">
-          Nous utilisons des cookies pour mesurer l&apos;audience et améliorer votre
-          expérience. Vous pouvez accepter ou refuser. Voir notre{" "}
-          <a className="underline" href="/confidentialite">
+        <p className="text-sm leading-relaxed text-ink-2">
+          Nous utilisons des cookies de mesure d&apos;audience pour améliorer le
+          site. Vous pouvez accepter ou refuser. Voir notre{" "}
+          <a
+            className="font-semibold text-ink underline decoration-clay underline-offset-4 transition-colors hover:text-clay"
+            href="/confidentialite"
+          >
             politique de confidentialité
           </a>
           .
@@ -62,14 +66,14 @@ export function CookieConsentBanner() {
           <button
             type="button"
             onClick={() => decide("refused")}
-            className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-400"
+            className="rounded-xl border border-line px-4 py-2 text-sm font-semibold text-ink transition-colors hover:bg-paper-2"
           >
             Tout refuser
           </button>
           <button
             type="button"
             onClick={() => decide("accepted")}
-            className="rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-900"
+            className="rounded-xl bg-ink px-4 py-2 text-sm font-semibold text-paper transition-colors hover:bg-black"
           >
             Tout accepter
           </button>

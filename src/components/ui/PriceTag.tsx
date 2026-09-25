@@ -1,5 +1,11 @@
 import { price } from "@/lib/constants";
+import { getDiscountPercent } from "@/lib/utils";
 
+/**
+ * Affichage prix + prix barré + réduction.
+ * Le pourcentage est toujours dérivé des prix par getDiscountPercent,
+ * comme sur les cartes produit (aucune incohérence possible).
+ */
 export function PriceTag({
   priceCents,
   compareAtPriceCents,
@@ -9,20 +15,22 @@ export function PriceTag({
   compareAtPriceCents?: number | null;
   className?: string;
 }) {
-  const hasDiscount = compareAtPriceCents && compareAtPriceCents > priceCents;
+  const discount = getDiscountPercent(priceCents, compareAtPriceCents);
 
   return (
     <div className={className}>
-      {hasDiscount && (
-        <span className="mr-2 text-sm text-gray-400 line-through">
-          {price(compareAtPriceCents!)}
-        </span>
-      )}
-      <span className="font-semibold text-gray-900">{price(priceCents)}</span>
-      {hasDiscount && (
-        <span className="ml-2 rounded bg-red-100 px-1.5 py-0.5 text-xs font-semibold text-red-700">
-          -{Math.round(((compareAtPriceCents! - priceCents) / compareAtPriceCents!) * 100)}%
-        </span>
+      <span className="text-3xl font-extrabold tracking-tight text-ink">
+        {price(priceCents)}
+      </span>
+      {discount && (
+        <>
+          <span className="ml-3 text-sm text-ink-3 line-through">
+            {price(compareAtPriceCents!)}
+          </span>
+          <span className="ml-2 inline-block rounded-full bg-clay-soft px-2 py-0.5 text-xs font-bold text-clay">
+            −{discount} %
+          </span>
+        </>
       )}
     </div>
   );

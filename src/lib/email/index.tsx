@@ -19,6 +19,7 @@ const FROM = () => process.env.EMAIL_FROM ?? "Store <no-reply@localhost>";
 const SUPPORT = () => process.env.EMAIL_REPLY_TO ?? "support@localhost";
 const APP_URL = () => process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 const LEGAL_NAME = () => process.env.STORE_LEGAL_NAME ?? "Votre Entreprise (SIRET à renseigner)";
+const EMAIL_STORE_NAME = () => process.env.EMAIL_STORE_NAME ?? "Format";
 
 function getResend() {
   const apiKey = process.env.RESEND_API_KEY;
@@ -129,7 +130,7 @@ export async function sendPurchaseConfirmation(orderId: string) {
   const total = order.totalCents;
   const pdf = await generateInvoicePdf({
 invoiceNumber,
-    storeName: "Templates Store",
+    storeName: EMAIL_STORE_NAME(),
     storeLegal: LEGAL_NAME(),
     buyerEmail: order.email,
     lines: order.items.map((it) => ({

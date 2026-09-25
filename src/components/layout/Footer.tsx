@@ -35,7 +35,7 @@ export function Footer() {
             {PRODUCT_CATEGORIES.map((c) => (
               <li key={c.slug}>
                 <Link
-                  href={`/produits#${c.slug}`}
+                  href={`/produits?categorie=${c.slug}`}
                   className="text-sm text-ink-2 transition-colors hover:text-ink"
                 >
                   {c.name}

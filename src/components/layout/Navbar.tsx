@@ -103,7 +103,7 @@ export function Navbar() {
               {PRODUCT_CATEGORIES.map((c) => (
                 <Link
                   key={c.slug}
-                  href={`/produits#${c.slug}`}
+                  href={`/produits?categorie=${c.slug}`}
                   className="flex items-center justify-between rounded-xl px-3 py-2.5 text-sm text-ink-2 transition-colors hover:bg-paper-2 hover:text-ink"
                 >
                   {c.name}
@@ -193,7 +193,7 @@ export function Navbar() {
                 {PRODUCT_CATEGORIES.map((c) => (
                   <li key={c.slug}>
                     <Link
-                      href={`/produits#${c.slug}`}
+                      href={`/produits?categorie=${c.slug}`}
                       onClick={() => setMenuOpen(false)}
                       className="flex items-center justify-between rounded-xl px-3 py-2 text-sm text-ink-2 hover:bg-paper-2 hover:text-ink"
                     >

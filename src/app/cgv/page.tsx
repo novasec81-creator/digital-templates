@@ -89,20 +89,25 @@ export default function CgvPage() {
 
         <section>
           <h2 className="text-lg font-semibold text-ink">
-            7. Droit applicable et litiges
+            8. Droit applicable et litiges
           </h2>
           <p className="mt-2">
-            Les présentes conditions sont soumises au droit français. À défaut
-            de résolution amiable, plateforme de règlement en ligne des litiges{" "}
-            <a
-              href="https://ec.europa.eu/consumers/odr"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-clay underline underline-offset-4"
-            >
-              ec.europa.eu/consumers/odr
-            </a>
-            .
+            Les présentes conditions sont soumises au droit français, sans
+            préjudice des dispositions protectrices applicables au lieu de
+            résidence du consommateur.
+          </p>
+          <p className="mt-2">
+            En cas de litige, nous privilégions d&apos;abord une résolution
+            amiable : contactez-nous par la page Contact pour toute
+            réclamation. Conformément à l&apos;article L612-1 du Code de la
+            consommation, le consommateur peut en outre recourir gratuitement à
+            un médiateur de la consommation en cas d&apos;échec de la réclamation
+            préalable ; les coordonnées du médiateur applicable figurent dans le
+            récapitulatif de commande.
+          </p>
+          <p className="mt-2">
+            À défaut de résolution amiable, le litige relève des juridictions
+            compétentes selon les règles légales en vigueur.
           </p>
         </section>
       </div>

@@ -5,7 +5,12 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { CookieConsentBanner } from "@/components/providers/CookieConsent";
 import { TrackingSetup } from "@/components/providers/TrackingSetup";
-import { STORE_DESCRIPTION, STORE_NAME } from "@/lib/constants";
+import {
+  ANALYTICS_CONFIGURED,
+  requireSiteUrl,
+  STORE_DESCRIPTION,
+  STORE_NAME,
+} from "@/lib/constants";
 
 const manrope = Manrope({
   variable: "--font-manrope",
@@ -14,7 +19,7 @@ const manrope = Manrope({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"),
+  metadataBase: new URL(requireSiteUrl("layout")),
   title: {
     default: STORE_NAME,
     template: `%s · ${STORE_NAME}`,
@@ -52,8 +57,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           {children}
         </main>
         <Footer />
-        <CookieConsentBanner />
-        <TrackingSetup />
+        {ANALYTICS_CONFIGURED && (
+          <>
+            <CookieConsentBanner />
+            <TrackingSetup />
+          </>
+        )}
       </body>
     </html>
   );

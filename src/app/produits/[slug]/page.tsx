@@ -12,7 +12,7 @@ import { ProductGallery } from "@/components/shop/ProductGallery";
 import { ProductCard } from "@/components/shop/ProductCard";
 import { PriceTag } from "@/components/ui/PriceTag";
 import { FaqAccordion } from "@/components/ui/FaqAccordion";
-import { CONTACT, STORE_NAME } from "@/lib/constants";
+import { CONTACT, CURRENCY, requireSiteUrl, STORE_NAME } from "@/lib/constants";
 
 export const dynamicParams = false;
 
@@ -64,15 +64,19 @@ export async function generateMetadata({
   const { slug } = await params;
   const product = getDemoProduct(slug);
   if (!product) return { title: "Produit introuvable" };
-  const base = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+  const base = requireSiteUrl("generateMetadata");
+  const description = product.description.slice(0, 160);
   return {
     title: product.title,
-    description: product.description.slice(0, 160),
+    description,
     alternates: { canonical: `${base}/produits/${product.slug}` },
     openGraph: {
       title: `${product.title} · ${STORE_NAME}`,
-      description: product.description.slice(0, 200),
+      description,
       type: "website",
+      ...(product.images[0]
+        ? { images: [{ url: `${base}${product.images[0]}`, alt: product.title }] }
+        : {}),
     },
   };
 }
@@ -86,7 +90,7 @@ export default async function ProductPage({
   const product = getDemoProduct(slug);
   if (!product) notFound();
 
-  const base = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+  const base = requireSiteUrl("produit");
   const productUrl = `${base}/produits/${product.slug}`;
 
   const similar = DEMO_PRODUCTS.filter(
@@ -104,11 +108,26 @@ export default async function ProductPage({
     category: product.category.name,
     offers: {
       "@type": "Offer",
-      priceCurrency: "EUR",
+      priceCurrency: CURRENCY,
       price: (product.priceCents / 100).toFixed(2),
       availability: "https://schema.org/InStock",
       url: productUrl,
     },
+  };
+
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org/",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Accueil", item: base },
+      { "@type": "ListItem", position: 2, name: "Catalogue", item: `${base}/produits` },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: product.title,
+        item: productUrl,
+      },
+    ],
   };
 
   return (
@@ -116,6 +135,10 @@ export default async function ProductPage({
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
 
       {/* Fil d'ariane */}
@@ -198,7 +221,7 @@ export default async function ProductPage({
 
           <div className="mt-8 flex flex-col gap-3">
             <Link
-              href="/contact"
+              href={`/contact?produit=${product.slug}`}
               className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-ink px-6 py-3.5 text-sm font-semibold text-paper transition-colors hover:bg-black sm:w-auto"
             >
               Commander ce template
@@ -308,7 +331,7 @@ export default async function ProductPage({
               Dans la même catégorie
             </h2>
             <Link
-              href={`/produits#${product.category.slug}`}
+              href={`/produits?categorie=${product.category.slug}`}
               className="group inline-flex shrink-0 items-center gap-1.5 text-sm font-semibold text-ink transition-colors hover:text-clay"
             >
               Toute la catégorie

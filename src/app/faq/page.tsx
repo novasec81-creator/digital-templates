@@ -36,7 +36,7 @@ const ORDER: FaqItem[] = [
   },
   {
     q: "Le téléchargement est-il instantané ?",
-    a: "Non : la livraison n'est pas automatisée. Chaque commande est confirmée manuellement, puis le fichier est transmis par email. Le site ne prétend pas offrir un téléchargement instantané.",
+    a: "Non. Chaque commande est confirmée manuellement, puis la ressource vous est envoyée par email. Comptez en moyenne un à deux jours ouvrés entre la confirmation et la réception des fichiers.",
   },
   {
     q: "Quels moyens de paiement sont acceptés ?",

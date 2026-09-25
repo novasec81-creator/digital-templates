@@ -9,6 +9,21 @@ export function formatPrice(cents: number, currency = "EUR") {
   }).format(cents / 100);
 }
 
+/**
+ * Calcul centralisé d'une réduction (prix barré).
+ * Retourne null si aucun prix de comparaison valide n'est fourni.
+ * Économie et pourcentage sont toujours dérivés des mêmes prix, partout.
+ */
+export function getDiscountPercent(
+  priceCents: number,
+  compareAtPriceCents?: number | null
+): number | null {
+  if (!compareAtPriceCents || compareAtPriceCents <= priceCents) return null;
+  return Math.round(
+    ((compareAtPriceCents - priceCents) / compareAtPriceCents) * 100
+  );
+}
+
 export function generateToken(bytes = 32) {
   const buffer = new Uint8Array(bytes);
   crypto.getRandomValues(buffer);

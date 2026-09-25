@@ -21,7 +21,7 @@ export function CategoryCard({
 
   return (
     <Link
-      href={`/produits#${category.slug}`}
+      href={`/produits?categorie=${category.slug}`}
       className="group flex flex-col rounded-2xl border border-line bg-paper p-5 shadow-card transition-all duration-200 hover:-translate-y-1 hover:border-line-strong hover:shadow-card-hover"
     >
       <div className="flex items-center justify-between">

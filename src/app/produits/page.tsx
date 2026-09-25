@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { ProductsBrowser } from "@/components/shop/ProductsBrowser";
 import { DEMO_PRODUCTS, PRODUCT_CATEGORIES } from "@/lib/demo-data";
 import { CONTACT, STORE_NAME } from "@/lib/constants";
@@ -25,10 +26,23 @@ export default function ProduitsPage() {
         <p className="max-w-xs text-xs leading-relaxed text-ink-3">{CONTACT.orderNote}</p>
       </div>
 
-      <ProductsBrowser
-        products={DEMO_PRODUCTS}
-        categories={PRODUCT_CATEGORIES}
-      />
+      <Suspense
+        fallback={
+          <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div
+                key={i}
+                className="aspect-[3/4] animate-pulse rounded-2xl bg-paper-2"
+              />
+            ))}
+          </div>
+        }
+      >
+        <ProductsBrowser
+          products={DEMO_PRODUCTS}
+          categories={PRODUCT_CATEGORIES}
+        />
+      </Suspense>
     </section>
   );
 }

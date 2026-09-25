@@ -142,7 +142,7 @@ export default function HomePage() {
           <div className="max-w-xl">
             <span className="inline-flex items-center gap-2 rounded-full border border-line bg-paper-2 px-3.5 py-1.5 text-xs font-semibold text-ink-2">
               <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-clay" />
-              Resources finies pour Notion, Excel, Canva, Lightroom &amp; CV
+              Ressources finies pour Notion, Excel, Canva, Lightroom &amp; CV
             </span>
             <h1 className="mt-5 text-4xl font-extrabold tracking-tight text-ink sm:text-5xl lg:text-[3.4rem] lg:leading-[1.06]">
               Des templates numériques,{" "}

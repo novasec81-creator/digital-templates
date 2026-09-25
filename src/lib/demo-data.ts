@@ -16,11 +16,14 @@ export interface DemoProduct {
   tagline: string;
   description: string;
   priceCents: number;
+  /** Prix de comparaison (pack : somme réelle des ressources). */
   compareAtPriceCents?: number | null;
   category: Pick<DemoCategory, "name" | "slug">;
   isBundle?: boolean;
   /** Uniquement pour identifier les récentes ajoutées (sélection éditoriale). */
   isNew?: boolean;
+  /** Date de publication (ordre déterministe pour le tri « Nouveautés »). */
+  createdAt: string;
   /** Motif du visuel illustratif (remplaçable par de vraies captures). */
   visual: ProductVisual;
   /** Défini pour les 3 catégories hors bundle, sert aussi de fond. */
@@ -98,9 +101,9 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
     description:
       "Un tableau de bord complet pour organiser vos tâches, vos projets et vos priorités. Modules pour le workflow quotidien, la vue hebdomadaire et le suivi des objectifs, reliés entre eux automatiquement.",
     priceCents: 1900,
-    compareAtPriceCents: 2900,
     category: { name: "Notion", slug: "notion" },
     isNew: true,
+    createdAt: "2026-07-22",
     visual: "notion",
     accent: "bg-gradient-to-br from-indigo-500 to-purple-600",
     images: [],
@@ -133,6 +136,7 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
     category: { name: "Notion", slug: "notion" },
     visual: "notion",
     accent: "bg-gradient-to-br from-emerald-500 to-teal-600",
+    createdAt: "2026-05-30",
     images: [],
     includes: [
       "Base unique « Vie 360° » avec 6 modules",
@@ -160,9 +164,9 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
     description:
       "Gérez votre pipeline clients : prospection, devis, statut des missions, facturation et suivi des paiements. Parfait pour indépendants et petites agences.",
     priceCents: 2900,
-    compareAtPriceCents: 3900,
     category: { name: "Notion", slug: "notion" },
     isNew: true,
+    createdAt: "2026-08-28",
     visual: "notion",
     accent: "bg-gradient-to-br from-blue-500 to-cyan-600",
     images: [],
@@ -174,9 +178,9 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
     ],
     features: [
       "Statuts de mission clairs",
-      "Relances de paiement organisées",
+      "Suivi de paiements organisé",
       "Données centralisées par client",
-      "Structure mutable sans coder",
+      "Évolutive sans coder",
     ],
     forWhom: [
       "Freelances en activité",
@@ -194,6 +198,7 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
     priceCents: 1200,
     category: { name: "Excel & Sheets", slug: "excel" },
     isNew: true,
+    createdAt: "2026-08-05",
     visual: "excel",
     accent: "bg-gradient-to-br from-green-500 to-emerald-700",
     images: [],
@@ -223,8 +228,8 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
     description:
       "Pilotez votre chiffre d'affaires : revenus, charges, TVA et bénéfices mois par mois. Synthèse automatique pour votre bilan et vos déclarations.",
     priceCents: 1600,
-    compareAtPriceCents: 2100,
     category: { name: "Excel & Sheets", slug: "excel" },
+    createdAt: "2026-06-15",
     visual: "excel",
     accent: "bg-gradient-to-br from-lime-500 to-green-700",
     images: [],
@@ -235,8 +240,8 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
       "Synthèse annuelle exportable",
     ],
     features: [
-      "Indicateurs clefs visibles d'un coup d'œil",
-      "Modèlestation par catégorie de charges",
+      "Indicateurs clés visibles d'un coup d'œil",
+      "Analyse des charges par catégorie",
       "Vue mois par mois ou cumulée",
       "Prêt pour vos relevés",
     ],
@@ -254,9 +259,9 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
     description:
       "20 pages modèles pour créer des carrousels qui vendent : accroche, problématique, étapes, appel à l'action. Tailles optimisées pour Instagram, LinkedIn et Facebook.",
     priceCents: 2200,
-    compareAtPriceCents: 3200,
     category: { name: "Canva", slug: "canva" },
     isNew: true,
+    createdAt: "2026-09-10",
     visual: "canva",
     accent: "bg-gradient-to-br from-pink-500 to-rose-600",
     images: [],
@@ -274,7 +279,7 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
     ],
     forWhom: [
       "Créatrices et créateurs de contenu",
-      "Coach.e.s et formatrices qui vendent en ligne",
+      "Coachs et formatrices qui vendent en ligne",
       "Marques qui publient de façon régulière",
     ],
   },
@@ -287,6 +292,7 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
       "Des mockups réalistes pour présenter vos livres numériques et produits digitaux : appareils, fonds de scène et compositions prêtes à l'emploi.",
     priceCents: 1800,
     category: { name: "Canva", slug: "canva" },
+    createdAt: "2026-05-02",
     visual: "canva",
     accent: "bg-gradient-to-br from-fuchsia-500 to-purple-700",
     images: [],
@@ -317,6 +323,7 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
       "Un rendu contrasté et cinématique pour la photo de rue et d'architecture. Fichier .xmp universel pour Lightroom desktop et mobile.",
     priceCents: 900,
     category: { name: "Presets Lightroom", slug: "lightroom" },
+    createdAt: "2026-04-12",
     visual: "lightroom",
     accent: "bg-gradient-to-br from-slate-600 to-slate-800",
     images: [],
@@ -346,8 +353,8 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
     description:
       "Un pack de 3 presets aux tons clairs et naturels pour la photo de mariage : peau juste, tenues éclatantes et ambiances douces.",
     priceCents: 1500,
-    compareAtPriceCents: 1900,
     category: { name: "Presets Lightroom", slug: "lightroom" },
+    createdAt: "2026-03-20",
     visual: "lightroom",
     accent: "bg-gradient-to-br from-amber-500 to-orange-600",
     images: [],
@@ -358,10 +365,10 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
       "Exemples de réglages avant / après",
     ],
     features: [
-      "Rendus clairs et naturels",
-      "Pensés peau et matières (robe, costumes)",
+      "Rendu clair et naturel",
+      "Pensés pour la peau et les matières (robes, costumes)",
       "Cohérence entre les photos d'un même reportage",
-      "Ajustables facilement par lot",
+      "Réglables facilement par lot",
     ],
     forWhom: [
       "Photographes de mariage",
@@ -378,6 +385,7 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
       "Un CV sobre et professionnel, structuré pour passer les logiciels de recrutement (ATS). Versions couleur et noir & blanc, guide de personnalisation inclus.",
     priceCents: 700,
     category: { name: "CV", slug: "cv" },
+    createdAt: "2026-03-01",
     visual: "cv",
     accent: "bg-gradient-to-br from-gray-700 to-gray-900",
     images: [],
@@ -407,8 +415,8 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
     description:
       "Un CV original pour les métiers créatifs : graphistes, développeurs, communicants. Design moderne, double colonne et 3 palettes de couleurs.",
     priceCents: 1100,
-    compareAtPriceCents: 1500,
     category: { name: "CV", slug: "cv" },
+    createdAt: "2026-02-14",
     visual: "cv",
     accent: "bg-gradient-to-br from-violet-500 to-indigo-700",
     images: [],
@@ -441,6 +449,7 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
     compareAtPriceCents: 3100,
     category: { name: "Notion", slug: "notion" },
     isBundle: true,
+    createdAt: "2026-09-18",
     visual: "bundle",
     accent: "bg-gradient-to-br from-indigo-600 to-emerald-600",
     images: [],

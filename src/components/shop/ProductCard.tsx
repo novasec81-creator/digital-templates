@@ -1,23 +1,21 @@
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
 import type { DemoProduct } from "@/lib/demo-data";
 import { ProductVisual } from "@/components/shop/ProductVisual";
 import { price } from "@/lib/constants";
+import { getDiscountPercent } from "@/lib/utils";
 
 /**
  * Carte produit premium, réutilisable dans toutes les grilles.
- * Le visuel est un motif de type (cf. ProductVisual) tant qu'aucune
- * capture réelle n'est fournie dans `product.images`.
+ * Dès qu'une vraie capture est fournie (`product.images`), elle remplace le
+ * visuel illustratif de type. Sinon, un motif de type est montré.
  */
 export function ProductCard({ product }: { product: DemoProduct }) {
-  const discount =
-    product.compareAtPriceCents && product.compareAtPriceCents > product.priceCents
-      ? Math.round(
-          ((product.compareAtPriceCents - product.priceCents) /
-            product.compareAtPriceCents) *
-            100
-        )
-      : null;
+  const discount = getDiscountPercent(
+    product.priceCents,
+    product.compareAtPriceCents
+  );
 
   return (
     <Link
@@ -25,12 +23,22 @@ export function ProductCard({ product }: { product: DemoProduct }) {
       className="group flex flex-col overflow-hidden rounded-2xl border border-line bg-paper shadow-card transition-all duration-200 hover:-translate-y-1 hover:border-line-strong hover:shadow-card-hover"
     >
       <div className="relative aspect-[4/3] overflow-hidden">
-        <ProductVisual
-          accent={product.accent}
-          visual={product.visual}
-          label={product.category.name}
-          className="h-full w-full"
-        />
+        {product.images[0] ? (
+          <Image
+            src={product.images[0]}
+            alt={`${product.title} — aperçu`}
+            fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+            className="object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+          />
+        ) : (
+          <ProductVisual
+            accent={product.accent}
+            visual={product.visual}
+            label={product.category.name}
+            className="h-full w-full"
+          />
+        )}
         <div className="absolute left-3 top-3 flex flex-col items-start gap-1.5">
           {product.isBundle && (
             <span className="rounded-full bg-ink/85 px-2.5 py-1 text-[11px] font-semibold text-paper backdrop-blur-sm">
@@ -51,7 +59,10 @@ export function ProductCard({ product }: { product: DemoProduct }) {
       </div>
 
       <div className="flex flex-1 flex-col p-4 sm:p-5">
-        <h3 className="line-clamp-2 text-[15px] font-semibold leading-snug text-ink">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-clay">
+          {product.category.name}
+        </p>
+        <h3 className="mt-1 line-clamp-2 text-[15px] font-semibold leading-snug text-ink">
           {product.title}
         </h3>
         <p className="mt-1 line-clamp-1 text-[13px] text-ink-2">{product.tagline}</p>

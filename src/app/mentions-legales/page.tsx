@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { STORE_LEGAL, STORE_NAME } from "@/lib/constants";
+import { requireSiteUrl, STORE_LEGAL, STORE_NAME } from "@/lib/constants";
 
 export const metadata: Metadata = { title: "Mentions légales" };
 
@@ -38,10 +38,10 @@ export default function MentionsLegalesPage() {
             email et les fichiers livrés par email après confirmation du
             client. Le site est accessible à l&apos;adresse{" "}
             <a
-              href={process.env.NEXT_PUBLIC_APP_URL ?? "/"}
+              href={requireSiteUrl("mentions-legales")}
               className="text-clay underline underline-offset-4"
             >
-              {process.env.NEXT_PUBLIC_APP_URL ?? "URL à renseigner"}
+              {requireSiteUrl("mentions-legales")}
             </a>
             .
           </p>

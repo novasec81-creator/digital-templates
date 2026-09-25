@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { CONTACT, STORE_LEGAL, STORE_NAME } from "@/lib/constants";
+import { ANALYTICS_CONFIGURED, CONTACT, STORE_LEGAL, STORE_NAME } from "@/lib/constants";
 
 export const metadata: Metadata = { title: "Politique de confidentialité" };
 
@@ -42,11 +42,13 @@ export default function PrivacyPage() {
               Données de commande : nom, adresse email, ressources demandées et
               échanges de confirmation (traités par email).
             </li>
-            <li>
-              Cookies de fonctionnement : votre choix de consentement aux
-              cookies et, si vous acceptez la mesure d&apos;audience, les cookies de
-              mesure correspondants.
-            </li>
+<li>
+            Cookies de fonctionnement : le cookie de consentement enregistrant
+            votre choix d&apos;accepter ou de refuser la mesure d&apos;audience.
+            {ANALYTICS_CONFIGURED
+              ? " Si vous acceptez, les cookies de mesure correspondants sont également déposés."
+              : ""}
+          </li>
           </ul>
         </section>
 
@@ -58,10 +60,12 @@ export default function PrivacyPage() {
               précontractuelles et exécution du contrat, art. 6.1.b RGPD).
             </li>
             <li>Obligations légales et comptables (art. 6.1.c RGPD).</li>
-            <li>
-              Mesure d&apos;audience, uniquement après votre consentement (art.
-              6.1.a RGPD).
-            </li>
+            {ANALYTICS_CONFIGURED && (
+              <li>
+                Mesure d&apos;audience, uniquement après votre consentement (art.
+                6.1.a RGPD).
+              </li>
+            )}
           </ul>
         </section>
 
@@ -69,9 +73,11 @@ export default function PrivacyPage() {
           <h2 className="text-lg font-semibold text-ink">4. Durées de conservation</h2>
           <p className="mt-2">
             Les échanges de commande et de facturation sont conservés le temps
-            nécessaire à nos obligations légales (facturation : 10 ans). Les
-            données de consentement aux cookies : 6 mois. Les cookies de mesure
-            : 13 mois maximum (recommandation CNIL).
+            nécessaire à nos obligations légales (facturation : 10 ans). Le
+            cookie de consentement, qui enregistre votre choix, est conservé 1
+            an. {ANALYTICS_CONFIGURED
+              ? "Les cookies de mesure d&apos;audience : 13 mois maximum (recommandation CNIL)."
+              : ""}
           </p>
         </section>
 
@@ -79,21 +85,32 @@ export default function PrivacyPage() {
           <h2 className="text-lg font-semibold text-ink">5. Sous-traitants et hébergement</h2>
           <p className="mt-2">
             Le site est hébergé par {STORE_LEGAL.host}. Les échanges par email
-            sont gérés par notre messagerie. Aucun script tiers de mesure n&apos;est
-            chargé sans votre consentement explicite.
+            sont gérés par notre messagerie.{" "}
+            {ANALYTICS_CONFIGURED
+              ? "Aucun script tiers de mesure n&apos;est chargé sans votre consentement explicite."
+              : "Aucun service tiers de mesure d&apos;audience n&apos;est utilisé sur ce site pour le moment."}
           </p>
         </section>
 
         <section>
           <h2 className="text-lg font-semibold text-ink">6. Cookies</h2>
-          <p className="mt-2">
-            Un bandeau vous permet d&apos;accepter ou de refuser les cookies non
-            indispensables, avec le même niveau de simplicité dans les deux
-            cas. Sans votre consentement, aucun script de mesure n&apos;est chargé.
-            Le refus est enregistré dans un cookie de fonctionnement. Vous
-            pouvez modifier votre choix à tout moment en effaçant les cookies de
-            votre navigateur.
-          </p>
+          {ANALYTICS_CONFIGURED ? (
+              <p className="mt-2">
+                Un bandeau vous permet d&apos;accepter ou de refuser les cookies
+                de mesure, avec le même niveau de simplicité dans les deux cas.
+                Sans votre consentement, aucun script de mesure n&apos;est chargé.
+                Le refus est enregistré dans un cookie de fonctionnement
+                conservé 1 an. Vous pouvez modifier votre choix à tout moment
+                en effaçant les cookies de votre navigateur.
+              </p>
+            ) : (
+              <p className="mt-2">
+                Ce site est entièrement statique et n&apos;utilise aucun cookie de
+                mesure ni de publicité : aucun bandeau de consentement n&apos;est
+                affiché, et aucune donnée de navigation n&apos;est collectée par des
+                services tiers.
+              </p>
+            )}
         </section>
 
         <section>

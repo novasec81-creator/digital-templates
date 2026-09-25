@@ -21,6 +21,44 @@ export function price(cents: number) {
   return formatPrice(cents, CURRENCY);
 }
 
+/**
+ * URL publique du site, utilisée pour le canonical, le sitemap, le robots,
+ * l'Open Graph et le JSON-LD. Ne passe jamais par une valeur locale en
+ * production : `requireSiteUrl()` fait échouer le build si elle manque.
+ */
+export const SITE_URL: string = (process.env.NEXT_PUBLIC_APP_URL ?? "").replace(/\/+$/, "");
+
+/**
+ * Retourne l'URL publique. En production (build), une URL manquante est une
+ * erreur bloquante : aucun canonical/sitemap/robots/OG ne doit être généré
+ * avec une adresse locale par erreur. En développement, un avertissement
+ * est affiché et une URL de secours locale est utilisée.
+ */
+export function requireSiteUrl(source: string): string {
+  if (SITE_URL) return SITE_URL;
+  const message = `[Format] ${source} : la variable d'environnement NEXT_PUBLIC_APP_URL est obligatoire en production (canonical, sitemap, robots, Open Graph, JSON-LD). Configurez-la avant de builder.`;
+  if (process.env.NODE_ENV === "production") {
+    throw new Error(message);
+  }
+  console.warn(message);
+  return "http://localhost:3000";
+}
+
+/**
+ * Coordonnées de contact. Laisser email vide affiche un état neutre.
+ */
+
+/**
+ * Un outil de mesure d'audience est-il configuré (GTM / GA4 / Clarity) ?
+ * Déterminé au build ; contrôle l'affichage du bandeau cookies et la
+ * politique de confidentialité afin que le site ne décrive que ce qu'il fait.
+ */
+export const ANALYTICS_CONFIGURED = Boolean(
+  process.env.NEXT_PUBLIC_GTM_ID ||
+    process.env.NEXT_PUBLIC_GA4_ID ||
+    process.env.NEXT_PUBLIC_CLARITY_ID
+);
+
 export const DOWNLOAD_LINK_TTL_HOURS = 72;
 export const DOWNLOAD_MAX_PER_TOKEN = 5;
 

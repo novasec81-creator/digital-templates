@@ -29,9 +29,9 @@ export default function AboutPage() {
         </p>
         <p>
           Chaque template est décrit tel qu&apos;il est livré, dans sa fiche
-          produit. Les prix affichés sont les prix réels de la vitrine. Aucun
-          compteur de ventes ni avis client fictif n&apos;est présenté : seules
-          les informations réellement vérifiables apparaissent sur le site.
+          produit, avec son contenu réel et son prix. Sur la page d&apos;accueil,
+          vous trouverez aussi une sélection des ressources de la vitrine,
+          mise à jour régulièrement.
         </p>
 
         <div className="rounded-2xl border border-line bg-paper-2 p-6">

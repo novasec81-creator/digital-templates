@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { ContactForm } from "@/components/contact/ContactForm";
 import { CONTACT } from "@/lib/constants";
 
@@ -25,7 +26,16 @@ export default function ContactPage() {
       <div className="mt-8">
         {hasEmail ? (
           <div className="rounded-2xl border border-line bg-paper p-6 shadow-card sm:p-8">
-            <ContactForm email={email} />
+            <Suspense
+              fallback={
+                <div className="grid animate-pulse gap-4">
+                  <div className="h-12 rounded-xl bg-paper-2" />
+                  <div className="h-40 rounded-xl bg-paper-2" />
+                </div>
+              }
+            >
+              <ContactForm email={email} />
+            </Suspense>
             <div className="mt-6 border-t border-line pt-5">
               <p className="text-sm text-ink-2">
                 Ou écrivez-nous directement :{" "}

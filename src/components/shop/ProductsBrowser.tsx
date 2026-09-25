@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useMemo } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { RotateCcw, Search, SlidersHorizontal, X } from "lucide-react";
 import type { DemoCategory, DemoProduct } from "@/lib/demo-data";
 import { ProductCard } from "@/components/shop/ProductCard";
@@ -13,15 +13,17 @@ const SORT_OPTIONS = [
   { value: "prix-desc", label: "Prix décroissant" },
 ];
 
-function readInit() {
-  if (typeof window === "undefined") return { q: "", tri: "" };
-  const params = new URLSearchParams(window.location.search);
-  return {
-    q: params.get("q") ?? "",
-    tri: params.get("tri") ?? "",
-  };
+function parseEuro(value: string | null): string | null {
+  if (!value) return null;
+  const n = Number(value);
+  return Number.isFinite(n) && n >= 0 ? String(Math.round(n)) : null;
 }
 
+/**
+ * Catalogue interactif. Tous les critères (recherche, catégorie, tri,
+ * prix min/max) vivent dans l'URL : un lien vers /produits?categorie=notion
+ * est donc partageable et reflète l'état réel du navigateur (retour, avant).
+ */
 export function ProductsBrowser({
   products,
   categories,
@@ -30,35 +32,56 @@ export function ProductsBrowser({
   categories: DemoCategory[];
 }) {
   const router = useRouter();
-  const [query, setQuery] = useState("");
-  const [category, setCategory] = useState<string | null>(null);
-  const [sort, setSort] = useState("recommande");
-  const [minPrice, setMinPrice] = useState("");
-  const [maxPrice, setMaxPrice] = useState("");
-  const [filtersOpen, setFiltersOpen] = useState(false);
+  const params = useSearchParams();
 
+  const query = params.get("q") ?? "";
+  const category = params.get("categorie") ?? "";
+  const sort = SORT_OPTIONS.some((o) => o.value === params.get("tri"))
+    ? (params.get("tri") as string)
+    : "recommande";
+  const minPrice = parseEuro(params.get("prix-min")) ?? "";
+  const maxPrice = parseEuro(params.get("prix-max")) ?? "";
+
+  // Migration : l'ancien lien /produits#<categorie> devient ?categorie=<slug>.
   useEffect(() => {
-    const { q, tri } = readInit();
-    // Lecture ponctuelle de l'URL au montage : acceptable ici.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    if (q) setQuery(q);
-    if (tri && SORT_OPTIONS.some((o) => o.value === tri)) setSort(tri);
     const hash = window.location.hash.replace("#", "");
-    if (hash && categories.some((c) => c.slug === hash)) setCategory(hash);
+    if (hash && categories.some((c) => c.slug === hash)) {
+      const next = new URLSearchParams(params.toString());
+      next.set("categorie", hash);
+      next.delete("q");
+      next.delete("tri");
+      next.delete("prix-min");
+      next.delete("prix-max");
+      router.replace(`/produits?${next.toString()}`, { scroll: false });
+      window.history.replaceState(null, "", `${window.location.pathname}?${next}`);
+    }
+    // exécuté une seule fois au montage
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {
-    const onHash = () => {
-      const hash = window.location.hash.replace("#", "");
-      setCategory(hash && categories.some((c) => c.slug === hash) ? hash : null);
-    };
-    window.addEventListener("hashchange", onHash);
-    return () => window.removeEventListener("hashchange", onHash);
-  }, [categories]);
+  const updateParams = (patch: Record<string, string | null>) => {
+    const next = new URLSearchParams();
+    const entries = [
+      ["q", query],
+      ["categorie", category],
+      ["tri", params.get("tri") ?? ""],
+      ["prix-min", minPrice],
+      ["prix-max", maxPrice],
+    ];
+    for (const [key, value] of entries) {
+      const patched = key in patch ? patch[key] : value;
+      if (patched && patched !== "") next.set(key, patched);
+    }
+    const qs = next.toString();
+    router.replace(qs ? `/produits?${qs}` : "/produits", { scroll: false });
+  };
 
   const hasActiveFilters =
-    query.trim() !== "" || !!category || minPrice !== "" || maxPrice !== "" || sort !== "recommande";
+    query.trim() !== "" ||
+    category !== "" ||
+    minPrice !== "" ||
+    maxPrice !== "" ||
+    sort !== "recommande";
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -67,11 +90,21 @@ export function ProductsBrowser({
 
     let list = products.filter((p) => {
       if (category && p.category.slug !== category) return false;
-      if (min !== null && p.priceCents < Math.round(min * 100)) return false;
-      if (max !== null && p.priceCents > Math.round(max * 100)) return false;
+      if (min !== null && p.priceCents < min * 100) return false;
+      if (max !== null && p.priceCents > max * 100) return false;
       if (q) {
-        const haystack =
-          [p.title, p.tagline, p.description, p.category.name].join(" ").toLowerCase();
+        const haystack = [
+          p.title,
+          p.tagline,
+          p.description,
+          p.category.name,
+          p.category.slug,
+          ...(p.features ?? []),
+          ...(p.includes ?? []),
+          ...(p.forWhom ?? []),
+        ]
+          .join(" ")
+          .toLowerCase();
         if (!haystack.includes(q)) return false;
       }
       return true;
@@ -80,6 +113,8 @@ export function ProductsBrowser({
     if (sort === "prix-asc") list = [...list].sort((a, b) => a.priceCents - b.priceCents);
     if (sort === "prix-desc") list = [...list].sort((a, b) => b.priceCents - a.priceCents);
     if (sort === "nouveautes") {
+      list = [...list].sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
+    } else {
       list = [...list].sort(
         (a, b) => Number(b.isNew ?? false) - Number(a.isNew ?? false)
       );
@@ -88,11 +123,7 @@ export function ProductsBrowser({
   }, [products, query, category, sort, minPrice, maxPrice]);
 
   function resetAll() {
-    setQuery("");
-    setCategory(null);
-    setSort("recommande");
-    setMinPrice("");
-    setMaxPrice("");
+    router.replace("/produits", { scroll: false });
   }
 
   const chipClass = (active: boolean) =>
@@ -114,7 +145,7 @@ export function ProductsBrowser({
           <input
             type="search"
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(e) => updateParams({ q: e.target.value })}
             placeholder="Rechercher par nom, catégorie ou besoin…"
             aria-label="Rechercher dans le catalogue"
             className="h-11 w-full rounded-full border border-line bg-paper-2 pl-11 pr-4 text-sm text-ink placeholder:text-ink-3 transition-colors focus:border-line-strong focus:bg-paper"
@@ -128,7 +159,7 @@ export function ProductsBrowser({
             <span className="hidden sm:inline">Trier :</span>
             <select
               value={sort}
-              onChange={(e) => setSort(e.target.value)}
+              onChange={(e) => updateParams({ tri: e.target.value })}
               aria-label="Trier les templates"
               className="h-11 rounded-full border border-line bg-paper px-4 pr-8 text-sm font-medium text-ink transition-colors focus:border-line-strong"
             >
@@ -147,11 +178,14 @@ export function ProductsBrowser({
         <div className="flex items-center justify-between lg:hidden">
           <button
             type="button"
-            onClick={() => setFiltersOpen((v) => !v)}
-            aria-expanded={filtersOpen}
+            onClick={() =>
+              updateParams({ filtres: params.get("filtres") === "1" ? null : "1" })
+            }
+            aria-expanded={params.get("filtres") === "1"}
+            aria-controls="filtres"
             className="inline-flex items-center gap-2 rounded-full border border-line px-4 py-2 text-sm font-semibold text-ink transition-colors hover:bg-paper-2"
           >
-            {filtersOpen ? (
+            {params.get("filtres") === "1" ? (
               <X className="h-4 w-4" aria-hidden="true" />
             ) : (
               <SlidersHorizontal className="h-4 w-4" aria-hidden="true" />
@@ -169,11 +203,16 @@ export function ProductsBrowser({
           )}
         </div>
 
-        <div className={`mt-4 lg:mt-0 ${filtersOpen ? "block" : "hidden lg:block"}`}>
+        <div
+          id="filtres"
+          className={`mt-4 lg:mt-0 ${
+            params.get("filtres") === "1" ? "block" : "hidden lg:block"
+          }`}
+        >
           <div className="flex flex-wrap items-center gap-2">
             <button
               type="button"
-              onClick={() => setCategory(null)}
+              onClick={() => updateParams({ categorie: null })}
               className={chipClass(!category)}
             >
               Tous
@@ -185,8 +224,9 @@ export function ProductsBrowser({
                 <button
                   key={c.slug}
                   type="button"
-                  onClick={() => setCategory(active ? null : c.slug)}
+                  onClick={() => updateParams({ categorie: active ? null : c.slug })}
                   className={chipClass(active)}
+                  aria-pressed={active}
                 >
                   {c.name} ({count})
                 </button>
@@ -204,7 +244,7 @@ export function ProductsBrowser({
                   step={1}
                   inputMode="decimal"
                   value={minPrice}
-                  onChange={(e) => setMinPrice(e.target.value)}
+                  onChange={(e) => updateParams({ "prix-min": e.target.value })}
                   aria-label="Prix minimum en euros"
                   placeholder="0"
                   className="h-10 w-20 rounded-xl border border-line bg-paper px-3 pl-6 text-sm text-ink focus:border-line-strong"
@@ -226,7 +266,7 @@ export function ProductsBrowser({
                   step={1}
                   inputMode="decimal"
                   value={maxPrice}
-                  onChange={(e) => setMaxPrice(e.target.value)}
+                  onChange={(e) => updateParams({ "prix-max": e.target.value })}
                   aria-label="Prix maximum en euros"
                   placeholder="100"
                   className="h-10 w-20 rounded-xl border border-line bg-paper px-3 pl-6 text-sm text-ink focus:border-line-strong"
@@ -268,7 +308,7 @@ export function ProductsBrowser({
           <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
             <button
               type="button"
-              onClick={() => router.push("/produits")}
+              onClick={resetAll}
               className="rounded-xl bg-ink px-5 py-2.5 text-sm font-semibold text-paper transition-colors hover:bg-black"
             >
               Voir tous les templates

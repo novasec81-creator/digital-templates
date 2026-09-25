@@ -61,7 +61,7 @@ export function BundleCard({ bundle }: { bundle: DemoBundle }) {
           )}
         </div>
         <Link
-          href="/contact"
+          href={`/contact?pack=${bundle.id}`}
           className="inline-flex shrink-0 items-center gap-1.5 rounded-xl bg-ink px-4 py-2.5 text-sm font-semibold text-paper transition-colors hover:bg-black"
         >
           Commander
