@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Build artifact local (déploiement direct) :
+    "dist/**",
   ]),
 ]);
 

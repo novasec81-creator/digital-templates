@@ -1,40 +1,78 @@
 import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
 import type { DemoProduct } from "@/lib/demo-data";
-import { PriceTag } from "@/components/ui/PriceTag";
-import { RatingStars } from "@/components/ui/RatingStars";
+import { ProductVisual } from "@/components/shop/ProductVisual";
+import { price } from "@/lib/constants";
 
+/**
+ * Carte produit premium, réutilisable dans toutes les grilles.
+ * Le visuel est un motif de type (cf. ProductVisual) tant qu'aucune
+ * capture réelle n'est fournie dans `product.images`.
+ */
 export function ProductCard({ product }: { product: DemoProduct }) {
-  const avgRating =
-    product.reviews.length > 0
-      ? product.reviews.reduce((s, r) => s + r.rating, 0) / product.reviews.length
-      : 0;
+  const discount =
+    product.compareAtPriceCents && product.compareAtPriceCents > product.priceCents
+      ? Math.round(
+          ((product.compareAtPriceCents - product.priceCents) /
+            product.compareAtPriceCents) *
+            100
+        )
+      : null;
 
   return (
     <Link
       href={`/produits/${product.slug}`}
-      className="group overflow-hidden rounded-xl border border-gray-200 bg-white transition-shadow hover:shadow-md"
+      className="group flex flex-col overflow-hidden rounded-2xl border border-line bg-paper shadow-card transition-all duration-200 hover:-translate-y-1 hover:border-line-strong hover:shadow-card-hover"
     >
-      <div className={`relative aspect-[4/3] overflow-hidden ${product.accent}`}>
-        <div className="flex h-full items-center justify-center">
-          <span className="text-5xl font-bold text-white/25 transition-transform duration-300 group-hover:scale-110">
-            {product.title.charAt(0)}
-          </span>
+      <div className="relative aspect-[4/3] overflow-hidden">
+        <ProductVisual
+          accent={product.accent}
+          visual={product.visual}
+          label={product.category.name}
+          className="h-full w-full"
+        />
+        <div className="absolute left-3 top-3 flex flex-col items-start gap-1.5">
+          {product.isBundle && (
+            <span className="rounded-full bg-ink/85 px-2.5 py-1 text-[11px] font-semibold text-paper backdrop-blur-sm">
+              Pack
+            </span>
+          )}
+          {product.isNew && !product.isBundle && (
+            <span className="rounded-full bg-paper/90 px-2.5 py-1 text-[11px] font-semibold text-ink backdrop-blur-sm">
+              Nouveau
+            </span>
+          )}
         </div>
-        {product.isBundle && (
-          <span className="absolute left-2 top-2 rounded bg-gray-900/80 px-2 py-0.5 text-xs font-semibold text-white">
-            Pack
+        {discount && (
+          <span className="absolute right-3 top-3 rounded-full bg-clay px-2.5 py-1 text-[11px] font-bold text-paper">
+            −{discount} %
           </span>
         )}
-        <span className="absolute bottom-2 right-2 rounded bg-black/30 px-2 py-0.5 text-xs font-medium text-white/90">
-          {product.category.name}
-        </span>
       </div>
-      <div className="p-4">
-        <p className="text-xs font-medium text-gray-500">{product.category.name}</p>
-        <h3 className="mt-1 line-clamp-2 font-semibold text-gray-900">{product.title}</h3>
-        <div className="mt-2 flex items-center justify-between">
-          <RatingStars rating={avgRating} count={product.reviews.length} />
-          <PriceTag priceCents={product.priceCents} compareAtPriceCents={product.compareAtPriceCents} />
+
+      <div className="flex flex-1 flex-col p-4 sm:p-5">
+        <h3 className="line-clamp-2 text-[15px] font-semibold leading-snug text-ink">
+          {product.title}
+        </h3>
+        <p className="mt-1 line-clamp-1 text-[13px] text-ink-2">{product.tagline}</p>
+
+        <div className="mt-auto flex items-end justify-between gap-3 pt-4">
+          <p className="flex items-baseline gap-2">
+            {discount && (
+              <span className="text-xs text-ink-3 line-through">
+                {price(product.compareAtPriceCents!)}
+              </span>
+            )}
+            <span className="text-base font-bold text-ink">
+              {price(product.priceCents)}
+            </span>
+          </p>
+          <span
+            aria-hidden="true"
+            className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-line text-ink transition-colors duration-200 group-hover:border-ink group-hover:bg-ink group-hover:text-paper"
+          >
+            <ArrowUpRight className="h-4 w-4" />
+          </span>
         </div>
       </div>
     </Link>

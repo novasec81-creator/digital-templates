@@ -1,69 +1,117 @@
 import Link from "next/link";
-import { STORE_NAME } from "@/lib/constants";
+import { Brand } from "@/components/brand/Brand";
+import { DEMO_PRODUCTS, PRODUCT_CATEGORIES } from "@/lib/demo-data";
+import { CONTACT, STORE_NAME } from "@/lib/constants";
+
+function footerCount(slug: string) {
+  return DEMO_PRODUCTS.filter((p) => p.category.slug === slug).length;
+}
 
 export function Footer() {
+  const year = new Date().getFullYear();
+
   return (
-    <footer className="border-t border-gray-200 bg-gray-50">
-      <div className="mx-auto grid max-w-6xl gap-8 px-4 py-12 text-sm md:grid-cols-3">
+    <footer className="border-t border-line bg-paper-2">
+      <div className="mx-auto grid max-w-6xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-2 lg:grid-cols-4">
         <div>
-          <p className="font-semibold text-gray-900">{STORE_NAME}</p>
-          <p className="mt-2 text-gray-600">
-            Des templates numériques premium, prêts à l&apos;emploi et livrés immédiatement.
+          <Brand />
+          <p className="mt-4 max-w-xs text-sm leading-relaxed text-ink-2">
+            Templates numériques pour Notion, Excel &amp; Sheets, Canva,
+            Lightroom et CV — conçus pour être utiles immédiatement.
+          </p>
+          <p className="mt-4 text-xs leading-relaxed text-ink-3">
+            Commandes par contact, livraison des fichiers par email.
           </p>
         </div>
+
         <div>
-          <p className="font-semibold text-gray-900">Templates</p>
-          <ul className="mt-2 space-y-1.5">
+          <p className="text-sm font-bold text-ink">Découvrir</p>
+          <ul className="mt-4 space-y-2.5">
             <li>
-              <Link href="/produits" className="text-gray-600 hover:text-gray-900">
+              <Link href="/produits" className="text-sm text-ink-2 transition-colors hover:text-ink">
                 Tous les templates
               </Link>
             </li>
+            {PRODUCT_CATEGORIES.map((c) => (
+              <li key={c.slug}>
+                <Link
+                  href={`/produits#${c.slug}`}
+                  className="text-sm text-ink-2 transition-colors hover:text-ink"
+                >
+                  {c.name}
+                  <span className="ml-1.5 text-xs text-ink-3">
+                    ({footerCount(c.slug)})
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div>
+          <p className="text-sm font-bold text-ink">Aide</p>
+          <ul className="mt-4 space-y-2.5">
             <li>
-              <Link href="/produits" className="text-gray-600 hover:text-gray-900">
-                Templates Notion
+              <Link href="/contact" className="text-sm text-ink-2 transition-colors hover:text-ink">
+                Contact
               </Link>
             </li>
             <li>
-              <Link href="/a-propos" className="text-gray-600 hover:text-gray-900">
+              <Link href="/faq" className="text-sm text-ink-2 transition-colors hover:text-ink">
+                FAQ
+              </Link>
+            </li>
+            <li>
+              <Link href="/a-propos" className="text-sm text-ink-2 transition-colors hover:text-ink">
                 À propos
               </Link>
             </li>
             <li>
-              <Link href="/contact" className="text-gray-600 hover:text-gray-900">
-                Contact
+              <Link
+                href="/#fonctionnement"
+                className="text-sm text-ink-2 transition-colors hover:text-ink"
+              >
+                Comment ça marche
               </Link>
             </li>
           </ul>
         </div>
+
         <div>
-          <p className="font-semibold text-gray-900">Informations légales</p>
-          <ul className="mt-2 space-y-1.5">
+          <p className="text-sm font-bold text-ink">Légal</p>
+          <ul className="mt-4 space-y-2.5">
             <li>
-              <Link href="/mentions-legales" className="text-gray-600 hover:text-gray-900">
+              <Link
+                href="/mentions-legales"
+                className="text-sm text-ink-2 transition-colors hover:text-ink"
+              >
                 Mentions légales
               </Link>
             </li>
             <li>
-              <Link href="/cgv" className="text-gray-600 hover:text-gray-900">
-                CGV
+              <Link href="/cgv" className="text-sm text-ink-2 transition-colors hover:text-ink">
+                Conditions générales de vente
               </Link>
             </li>
             <li>
-              <Link href="/confidentialite" className="text-gray-600 hover:text-gray-900">
+              <Link
+                href="/confidentialite"
+                className="text-sm text-ink-2 transition-colors hover:text-ink"
+              >
                 Politique de confidentialité
-              </Link>
-            </li>
-            <li>
-              <Link href="/contact" className="text-gray-600 hover:text-gray-900">
-                Contact
               </Link>
             </li>
           </ul>
         </div>
       </div>
-      <div className="border-t border-gray-200 py-4 text-center text-xs text-gray-500">
-        © {new Date().getFullYear()} {STORE_NAME}. Tous droits réservés.
+
+      <div className="border-t border-line">
+        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-2 px-4 py-5 text-xs text-ink-3 sm:flex-row sm:px-6">
+          <p>
+            © {year} {STORE_NAME}. Tous droits réservés.
+          </p>
+          <p>{CONTACT.responseDelay}</p>
+        </div>
       </div>
     </footer>
   );

@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import { contactSchema } from "@/lib/validations";
-import { STORE_LEGAL } from "@/lib/constants";
+import { STORE_NAME } from "@/lib/constants";
 
-export function ContactForm() {
+export function ContactForm({ email }: { email: string }) {
   const [state, setState] = useState({
     name: "",
     email: "",
@@ -24,20 +24,20 @@ export function ContactForm() {
 
     const parsed = contactSchema.safeParse(state);
     if (!parsed.success) {
-      setError("Merci de remplir tous les champs correctement.");
+      setError("Merci de remplir correctement tous les champs obligatoires.");
       setStatus("error");
       return;
     }
 
-    const subject = `[Templates Store] ${parsed.data.subject || "Contact"}`;
+    const subject = `[${STORE_NAME}] ${parsed.data.subject || "Demande de contact"}`;
     const body = [
       `Nom : ${parsed.data.name}`,
-      `Email : ${parsed.data.email}`,
+      `Email de réponse : ${parsed.data.email}`,
       "",
       parsed.data.message,
     ].join("\n");
 
-    const mailto = `mailto:${STORE_LEGAL.email}?subject=${encodeURIComponent(
+    const mailto = `mailto:${email}?subject=${encodeURIComponent(
       subject
     )}&body=${encodeURIComponent(body)}`;
     window.location.href = mailto;
@@ -46,26 +46,29 @@ export function ContactForm() {
 
   if (status === "sent") {
     return (
-      <div className="rounded-lg border border-green-200 bg-green-50 p-4 text-sm text-green-800">
-        Votre client email s&apos;est ouvert avec votre message pré-rempli. Merci de
-        l&apos;envoyer pour nous contacter.
+      <div className="rounded-xl border border-line bg-paper-2 px-5 py-4 text-sm text-ink-2">
+        Votre messagerie s&apos;est ouverte avec le message pré-rempli. Il ne
+        vous reste qu&apos;à l&apos;envoyer. Merci !
       </div>
     );
   }
 
   const fields = [
     { key: "name" as const, label: "Nom", type: "text", required: true },
-    { key: "email" as const, label: "Email", type: "email", required: true },
+    { key: "email" as const, label: "Votre email", type: "email", required: true },
     { key: "subject" as const, label: "Sujet", type: "text", required: false },
   ];
+
+  const inputClass =
+    "mt-1.5 w-full rounded-xl border border-line bg-paper px-3.5 py-2.5 text-sm text-ink placeholder:text-ink-3 transition-colors focus:border-line-strong";
 
   return (
     <form onSubmit={submit} className="space-y-4">
       <div className="grid gap-4 sm:grid-cols-2">
         {fields.map((f) => (
           <div key={f.key}>
-            <label htmlFor={f.key} className="block text-sm font-medium text-gray-700">
-              {f.label}
+            <label htmlFor={f.key} className="block text-sm font-medium text-ink-2">
+              {f.label} {f.required && <span className="text-clay">*</span>}
             </label>
             <input
               id={f.key}
@@ -73,14 +76,14 @@ export function ContactForm() {
               required={f.required}
               value={state[f.key]}
               onChange={(e) => update(f.key, e.target.value)}
-              className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900"
+              className={inputClass}
             />
           </div>
         ))}
       </div>
       <div>
-        <label htmlFor="message" className="block text-sm font-medium text-gray-700">
-          Message
+        <label htmlFor="message" className="block text-sm font-medium text-ink-2">
+          Message <span className="text-clay">*</span>
         </label>
         <textarea
           id="message"
@@ -88,15 +91,16 @@ export function ContactForm() {
           rows={5}
           value={state.message}
           onChange={(e) => update("message", e.target.value)}
-          className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900"
+          placeholder="Le template qui vous intéresse, votre projet, vos questions…"
+          className={`${inputClass} resize-none`}
         />
       </div>
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && <p className="text-sm text-clay">{error}</p>}
       <button
         type="submit"
-        className="rounded-md bg-gray-900 px-6 py-3 text-sm font-semibold text-white hover:bg-gray-800"
+        className="rounded-xl bg-ink px-6 py-3 text-sm font-semibold text-paper transition-colors hover:bg-black"
       >
-        Envoyer
+        Envoyer le message
       </button>
     </form>
   );

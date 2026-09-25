@@ -1,8 +1,19 @@
 import { formatPrice } from "@/lib/utils";
 
-export const STORE_NAME = "Templates Store";
+/**
+ * Configuration centrale du site.
+ * Toutes les informations de marque, de contact et de livraison sont
+ * centralisées ici : modifiez ce fichier (ou les variables d'environnement
+ * correspondantes) pour mettre à jour l'ensemble du site.
+ */
+
+export const STORE_NAME = "Format";
+
 export const STORE_SLOGAN =
-  "Des templates numériques prêts à l'emploi : Notion, Excel, Canva, Lightroom, CV.";
+  "Templates numériques pour Notion, Excel, Canva, Lightroom et CV — conçus pour être utiles immédiatement.";
+
+export const STORE_DESCRIPTION =
+  "Format — une sélection éditoriale de templates numériques prêts à l'emploi : organisation Notion, tableurs Excel et Google Sheets, modèles Canva, presets Lightroom et modèles de CV.";
 
 export const CURRENCY = process.env.NEXT_PUBLIC_CURRENCY ?? "EUR";
 
@@ -13,11 +24,40 @@ export function price(cents: number) {
 export const DOWNLOAD_LINK_TTL_HOURS = 72;
 export const DOWNLOAD_MAX_PER_TOKEN = 5;
 
+/** Coordonnées de contact. Laisser email vide affiche un état neutre. */
+export const CONTACT = {
+  email: process.env.STORE_CONTACT_EMAIL ?? "",
+  responseDelay: "Réponse sous 24 h ouvrées.",
+  orderNote:
+    "Les commandes sont confirmées manuellement : le template est ensuite envoyé par email, prêt à l'emploi.",
+};
+
+/** Processus de livraison réel du site (vitrine sans système de paiement automatisé). */
+export const DELIVERY = {
+  steps: [
+    {
+      title: "Explorez",
+      text: "Parcourez le catalogue et repérez le template qui correspond à votre besoin.",
+    },
+    {
+      title: "Commandez",
+      text: "Envoyez votre demande via la page Contact. Nous confirmons par email la disponibilité et les modalités de règlement.",
+    },
+    {
+      title: "Utilisez",
+      text: "Après confirmation, vous recevez le fichier par email. Dupliquez-le et personnalisez-le immédiatement.",
+    },
+  ],
+  details:
+    "Chaque commande est traitée manuellement : il n'y a ni paiement automatisé ni téléchargement instantané. Vous recevez le template par email après confirmation de la commande.",
+};
+
+/** Informations légales (valeurs par défaut neutres — à compléter par l'éditeur). */
 export const STORE_LEGAL = {
-  editorName: process.env.STORE_LEGAL_NAME ?? "Votre entreprise — à compléter",
-  host: "Vercel Inc., 340 S Lemon Ave #4133, Walnut, CA 91789, USA",
-  email: process.env.EMAIL_REPLY_TO ?? "support@exemple.fr",
-  address: "Adresse de l'éditeur — à compléter",
-  siret: "SIRET à compléter",
-  vatNumber: process.env.STORE_VAT_NUMBER ?? "TVA à compléter",
+  editorName: process.env.STORE_LEGAL_NAME || "À compléter",
+  host: "Cloudflare, Inc., 101 Townsend St, San Francisco, CA 94107, États-Unis",
+  email: CONTACT.email,
+  address: process.env.STORE_LEGAL_ADDRESS || "À compléter",
+  siret: process.env.STORE_SIRET || "À compléter",
+  vatNumber: process.env.STORE_VAT_NUMBER || "À compléter",
 };
