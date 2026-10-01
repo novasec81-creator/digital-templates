@@ -45,10 +45,6 @@ export function requireSiteUrl(source: string): string {
 }
 
 /**
- * Coordonnées de contact. Laisser email vide affiche un état neutre.
- */
-
-/**
  * Un outil de mesure d'audience est-il configuré (GTM / GA4 / Clarity) ?
  * Déterminé au build ; contrôle l'affichage du bandeau cookies et la
  * politique de confidentialité afin que le site ne décrive que ce qu'il fait.
