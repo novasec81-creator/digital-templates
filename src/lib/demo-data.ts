@@ -1,11 +1,40 @@
 export type ProductVisual = "notion" | "excel" | "canva" | "lightroom" | "cv" | "bundle";
 
+/**
+ * Rôle d'une image produit.
+ * - `cover`   : image principale (affichée sur les cartes et en tête de galerie) ;
+ * - `preview` : capture supplémentaire (galerie, survol desktop) ;
+ * - `detail`  : image de détail (zoom, dernière vignette).
+ *
+ * L'ordre du tableau définit l'ordre d'affichage : la première image `cover`
+ * (ou, à défaut, la première image tout court) sert d'image principale.
+ */
+export type ProductImageRole = "cover" | "preview" | "detail";
+
+export interface ProductImage {
+  /** Chemin public, ex. "/images/gestionnaire-de-taches-1.png". */
+  src: string;
+  /** Texte alternatif : décrit la capture, jamais décoratif. */
+  alt: string;
+  /** Rôle dans la galerie. */
+  role: ProductImageRole;
+  /** Largeur et hauteur connues, pour réserver la place et éviter les décalages. */
+  width?: number;
+  height?: number;
+}
+
 export interface DemoCategory {
   name: string;
   slug: string;
   tagline: string;
   blurb: string;
   visual: Exclude<ProductVisual, "bundle">;
+  /**
+   * Formats réellement concernés par les produits de la catégorie.
+   * Sert la section « Compatibilité » des fiches et la catégorisation du
+   * catalogue. Ne contient que des outils réellement supportés.
+   */
+  compatibility: string[];
 }
 
 export interface DemoProduct {
@@ -24,16 +53,24 @@ export interface DemoProduct {
   isNew?: boolean;
   /** Date de publication (ordre déterministe pour le tri « Nouveautés »). */
   createdAt: string;
-  /** Motif du visuel illustratif (remplaçable par de vraies captures). */
-  visual: ProductVisual;
-  /** Défini pour les 3 catégories hors bundle, sert aussi de fond. */
-  accent: string;
   /**
-   * Vraies captures d'écran (chemin public, ex. "/images/notion-taches-1.png").
-   * Tant que ce tableau est vide, un visuel illustratif de type (non trompeur)
-   * est affiché à la place.
+   * Direction artistique du visuel illustratif de repli. Remplace l'ancien
+   * `accent` (gradients colorés multicolonnes, hors identité Format) : les
+   * fallbacks sont désormais dessinés dans la palette ink / paper / clay.
    */
-  images: string[];
+  visual: ProductVisual;
+  /**
+   * Vraies captures d'écran. Tant que ce tableau est vide, une illustration
+   * de présentation propre à la catégorie est affichée — jamais une fausse
+   * capture ni une capture d'un autre produit.
+   */
+  images: ProductImage[];
+  /**
+   * Formats livrés pour ce produit, si plus précis que la catégorie
+   * (ex. `.docx` pour un CV, `.xmp` pour un preset). Sert la section
+   * « Compatibilité » de la fiche.
+   */
+  formats?: string[];
   /** « Ce que vous obtenez » : cartes/liste sous la fiche. */
   includes: string[];
   /** Fonctionnalités mises en avant. */
@@ -51,7 +88,6 @@ export interface DemoBundle {
   /** Slugs des produits du catalogue inclus dans le pack. */
   memberSlugs: string[];
   packPriceCents: number;
-  accent: string;
 }
 
 export const PRODUCT_CATEGORIES: DemoCategory[] = [
@@ -61,6 +97,7 @@ export const PRODUCT_CATEGORIES: DemoCategory[] = [
     tagline: "Organisation & productivité",
     blurb: "Bases reliées, vues et automatisations pour structurer vos projets.",
     visual: "notion",
+    compatibility: ["Notion (web, desktop, mobile)", "Compte Notion gratuit"],
   },
   {
     name: "Excel & Sheets",
@@ -68,6 +105,7 @@ export const PRODUCT_CATEGORIES: DemoCategory[] = [
     tagline: "Tableurs & suivis",
     blurb: "Suivis clairs, graphiques automatiques et projections fiables.",
     visual: "excel",
+    compatibility: ["Microsoft Excel (.xlsx)", "Google Sheets", "Excel mobile"],
   },
   {
     name: "Canva",
@@ -75,6 +113,7 @@ export const PRODUCT_CATEGORIES: DemoCategory[] = [
     tagline: "Visuels & réseaux sociaux",
     blurb: "Carrousels, mockups et documents prêts à publier en quelques clics.",
     visual: "canva",
+    compatibility: ["Canva (web, desktop, mobile)", "Compte Canva gratuit"],
   },
   {
     name: "Presets Lightroom",
@@ -82,6 +121,11 @@ export const PRODUCT_CATEGORIES: DemoCategory[] = [
     tagline: "Rendus photo cohérents",
     blurb: "Des ambiances définies, appliquables en un clic à vos séries.",
     visual: "lightroom",
+    compatibility: [
+      "Lightroom Classic",
+      "Lightroom CC (desktop & mobile)",
+      "Lightroom mobile",
+    ],
   },
   {
     name: "CV",
@@ -89,6 +133,7 @@ export const PRODUCT_CATEGORIES: DemoCategory[] = [
     tagline: "Documents de carrière",
     blurb: "Des modèles sobres et structurés pour valoriser votre profil.",
     visual: "cv",
+    compatibility: ["Microsoft Word (.docx)", "Canva", "Google Docs"],
   },
 ];
 
@@ -105,7 +150,7 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
     isNew: true,
     createdAt: "2026-07-22",
     visual: "notion",
-    accent: "bg-gradient-to-br from-indigo-500 to-purple-600",
+    formats: ["Lien de duplication Notion"],
     images: [],
     includes: [
       "Base Notion complète, prête à dupliquer",
@@ -135,8 +180,8 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
     priceCents: 2400,
     category: { name: "Notion", slug: "notion" },
     visual: "notion",
-    accent: "bg-gradient-to-br from-emerald-500 to-teal-600",
     createdAt: "2026-05-30",
+    formats: ["Lien de duplication Notion"],
     images: [],
     includes: [
       "Base unique « Vie 360° » avec 6 modules",
@@ -168,7 +213,7 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
     isNew: true,
     createdAt: "2026-08-28",
     visual: "notion",
-    accent: "bg-gradient-to-br from-blue-500 to-cyan-600",
+    formats: ["Lien de duplication Notion"],
     images: [],
     includes: [
       "Base clients complète (prospection → paiement)",
@@ -200,7 +245,7 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
     isNew: true,
     createdAt: "2026-08-05",
     visual: "excel",
-    accent: "bg-gradient-to-br from-green-500 to-emerald-700",
+    formats: ["Fichier Excel (.xlsx)", "Version Google Sheets"],
     images: [],
     includes: [
       "Fichier Excel (ou version Google Sheets)",
@@ -231,7 +276,7 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
     category: { name: "Excel & Sheets", slug: "excel" },
     createdAt: "2026-06-15",
     visual: "excel",
-    accent: "bg-gradient-to-br from-lime-500 to-green-700",
+    formats: ["Fichier Excel (.xlsx)", "Version Google Sheets"],
     images: [],
     includes: [
       "Fichier Excel (ou Google Sheets)",
@@ -263,7 +308,7 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
     isNew: true,
     createdAt: "2026-09-10",
     visual: "canva",
-    accent: "bg-gradient-to-br from-pink-500 to-rose-600",
+    formats: ["Lien de duplication Canva"],
     images: [],
     includes: [
       "20 pages Canva modifiables",
@@ -294,7 +339,7 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
     category: { name: "Canva", slug: "canva" },
     createdAt: "2026-05-02",
     visual: "canva",
-    accent: "bg-gradient-to-br from-fuchsia-500 to-purple-700",
+    formats: ["Lien de duplication Canva"],
     images: [],
     includes: [
       "10 compositions mockups modifiables",
@@ -325,7 +370,7 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
     category: { name: "Presets Lightroom", slug: "lightroom" },
     createdAt: "2026-04-12",
     visual: "lightroom",
-    accent: "bg-gradient-to-br from-slate-600 to-slate-800",
+    formats: ["Fichiers .xmp Lightroom", "Version mobile"],
     images: [],
     includes: [
       "Fichier preset .xmp (Lightroom desktop)",
@@ -356,7 +401,7 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
     category: { name: "Presets Lightroom", slug: "lightroom" },
     createdAt: "2026-03-20",
     visual: "lightroom",
-    accent: "bg-gradient-to-br from-amber-500 to-orange-600",
+    formats: ["3 fichiers .xmp Lightroom", "Versions mobiles"],
     images: [],
     includes: [
       "3 fichiers preset .xmp",
@@ -387,7 +432,7 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
     category: { name: "CV", slug: "cv" },
     createdAt: "2026-03-01",
     visual: "cv",
-    accent: "bg-gradient-to-br from-gray-700 to-gray-900",
+    formats: ["Modèle Word (.docx)", "Version PDF incluse"],
     images: [],
     includes: [
       "Modèle CV .docx structuré (ATS)",
@@ -418,7 +463,7 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
     category: { name: "CV", slug: "cv" },
     createdAt: "2026-02-14",
     visual: "cv",
-    accent: "bg-gradient-to-br from-violet-500 to-indigo-700",
+    formats: ["Lien de duplication Canva", "Version PDF"],
     images: [],
     includes: [
       "Modèle Canva double colonne",
@@ -451,7 +496,7 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
     isBundle: true,
     createdAt: "2026-09-18",
     visual: "bundle",
-    accent: "bg-gradient-to-br from-indigo-600 to-emerald-600",
+    formats: ["Lien de duplication Notion", "Fichier Excel (.xlsx)"],
     images: [],
     includes: [
       "Gestionnaire de tâches Notion",
@@ -490,7 +535,6 @@ export const DEMO_BUNDLES: DemoBundle[] = [
       "suivi-ca-freelance-excel",
     ],
     packPriceCents: 4299,
-    accent: "bg-gradient-to-br from-blue-600 to-indigo-700",
   },
   {
     id: "bundle-photographe",
@@ -500,7 +544,6 @@ export const DEMO_BUNDLES: DemoBundle[] = [
       "Les deux packs de presets pour couvrir la rue et les événements avec un rendu cohérent.",
     memberSlugs: ["preset-lightroom-urbain", "preset-lightroom-mariage"],
     packPriceCents: 1800,
-    accent: "bg-gradient-to-br from-slate-700 to-amber-600",
   },
   {
     id: "bundle-cv",
@@ -510,12 +553,87 @@ export const DEMO_BUNDLES: DemoBundle[] = [
       "Un CV structuré pour les machines et un CV créatif pour se distinguer : couvrez les deux cas.",
     memberSlugs: ["cv-moderne-ats", "cv-creatif-freelance"],
     packPriceCents: 1299,
-    accent: "bg-gradient-to-br from-gray-700 to-violet-700",
   },
 ];
 
 export function getDemoProduct(slug: string): DemoProduct | undefined {
   return DEMO_PRODUCTS.find((p) => p.slug === slug);
+}
+
+/**
+ * Image principale d'un produit : la première image de rôle `cover`, sinon la
+ * première image du tableau. Retourne `undefined` si le produit n'a aucune
+ * capture — les appelants affichent alors le fallback illustratif.
+ */
+export function getCoverImage(product: DemoProduct): ProductImage | undefined {
+  return product.images.find((img) => img.role === "cover") ?? product.images[0];
+}
+
+/**
+ * Liste ordonnée des images de galerie : la cover en premier, puis les
+ * previews et détails dans l'ordre du tableau. Les doublons de `src` sont
+ * retirés — deux entrées identiques produiraient des clés React en double
+ * et une vignette visuellement redondante.
+ */
+export function getGalleryImages(product: DemoProduct): ProductImage[] {
+  const cover = getCoverImage(product);
+  if (!cover) return [];
+  const seen = new Set<string>([cover.src]);
+  const rest: ProductImage[] = [];
+  for (const img of product.images) {
+    if (img.src === cover.src || seen.has(img.src)) continue;
+    seen.add(img.src);
+    rest.push(img);
+  }
+  return [cover, ...rest];
+}
+
+/** Une seconde image existe-t-elle pour un aperçu au survol (desktop) ? */
+export function getHoverImage(product: DemoProduct): ProductImage | undefined {
+  const [, second] = getGalleryImages(product);
+  return second;
+}
+
+/** Vraies captures disponibles ? Détermine l'usage de la galerie. */
+export function hasRealImages(product: DemoProduct): boolean {
+  return getGalleryImages(product).length > 0;
+}
+
+/** Formats effectivement livrés : ceux du produit, sinon ceux de sa catégorie. */
+export function getCompatibility(product: DemoProduct): string[] {
+  if (product.formats && product.formats.length > 0) return product.formats;
+  const category = PRODUCT_CATEGORIES.find((c) => c.slug === product.category.slug);
+  return category?.compatibility ?? [];
+}
+
+/** Packs du catalogue contenant réellement ce produit (via les slugs membres). */
+export function getBundlesForProduct(slug: string): DemoBundle[] {
+  return DEMO_BUNDLES.filter((b) => b.memberSlugs.includes(slug));
+}
+
+/**
+ * Produits recommandés : même catégorie en priorité, complétés par des
+ * ressources d'autres catégories si la catégorie est trop petite.
+ * Le produit courant est toujours exclu, et la liste est plafonnée à 3.
+ */
+export function getSimilarProducts(product: DemoProduct, limit = 3): DemoProduct[] {
+  const others = DEMO_PRODUCTS.filter((p) => p.id !== product.id);
+
+  const sameCategory = others.filter(
+    (p) => p.category.slug === product.category.slug
+  );
+  const sameVisual = others.filter(
+    (p) =>
+      p.category.slug !== product.category.slug &&
+      p.visual === product.visual
+  );
+  const rest = others.filter(
+    (p) =>
+      p.category.slug !== product.category.slug &&
+      p.visual !== product.visual
+  );
+
+  return [...sameCategory, ...sameVisual, ...rest].slice(0, limit);
 }
 
 export function getProductsByCategory(slug: string): DemoProduct[] {

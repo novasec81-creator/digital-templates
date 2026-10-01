@@ -29,6 +29,7 @@ export const metadata: Metadata = {
     siteName: STORE_NAME,
     type: "website",
     locale: "fr_FR",
+    url: requireSiteUrl("layout"),
   },
   robots: {
     index: true,

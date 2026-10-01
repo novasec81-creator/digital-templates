@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
-import { CONTACT, STORE_NAME } from "@/lib/constants";
+import { canonicalPath, CONTACT, STORE_NAME } from "@/lib/constants";
 
-export const metadata: Metadata = { title: "Conditions Générales de Vente" };
+export const metadata: Metadata = {
+  title: "Conditions Générales de Vente",
+  description: `Conditions générales de vente de ${STORE_NAME} : commande, livraison des fichiers numériques, rétractation et litiges.`,
+  alternates: { canonical: canonicalPath("/cgv") },
+};
 
 export const dynamic = "force-static";
 

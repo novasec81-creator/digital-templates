@@ -2,12 +2,15 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { ProductsBrowser } from "@/components/shop/ProductsBrowser";
 import { DEMO_PRODUCTS, PRODUCT_CATEGORIES } from "@/lib/demo-data";
-import { CONTACT, STORE_NAME } from "@/lib/constants";
+import { canonicalPath, CONTACT, STORE_NAME } from "@/lib/constants";
 
 export const metadata: Metadata = {
   title: "Tous les templates",
   description:
     "Tous nos templates numériques : Notion, Excel & Google Sheets, Canva, presets Lightroom et modèles de CV. Commande par contact, livraison par email.",
+  // Le catalogue reste canonique sur /produits : les variantes de recherche,
+  // de catégorie, de tri et de budget ne doivent pas être indexées.
+  alternates: { canonical: canonicalPath("/produits") },
 };
 
 export default function ProduitsPage() {

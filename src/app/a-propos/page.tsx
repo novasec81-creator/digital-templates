@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { CONTACT, DELIVERY, STORE_NAME } from "@/lib/constants";
+import { canonicalPath, CONTACT, DELIVERY, STORE_NAME } from "@/lib/constants";
 
 export const metadata: Metadata = {
   title: "À propos",
   description: `À propos de ${STORE_NAME} : une vitrine de templates numériques conçus pour être utiles immédiatement.`,
+  alternates: { canonical: canonicalPath("/a-propos") },
 };
 
 export default function AboutPage() {

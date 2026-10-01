@@ -18,14 +18,26 @@ import { FaqAccordion, type FaqItem } from "@/components/ui/FaqAccordion";
 import {
   DEMO_BUNDLES,
   DEMO_PRODUCTS,
+  getCoverImage,
   getDemoProduct,
+  isNewProducts,
   PRODUCT_CATEGORIES,
+  type DemoProduct,
 } from "@/lib/demo-data";
-import { CONTACT, DELIVERY, STORE_DESCRIPTION, STORE_NAME, price } from "@/lib/constants";
+import {
+  canonicalPath,
+  CONTACT,
+  DELIVERY,
+  STORE_DESCRIPTION,
+  STORE_NAME,
+  price,
+} from "@/lib/constants";
 
+/** Canonical explicite : la page d'accueil ne doit jamais indexer de doublon. */
 export const metadata: Metadata = {
   title: "Templates Notion, Excel, Canva, Lightroom & CV",
   description: STORE_DESCRIPTION,
+  alternates: { canonical: canonicalPath("/") },
 };
 
 const SELECTION_SLUGS = [
@@ -33,6 +45,19 @@ const SELECTION_SLUGS = [
   "budget-personnel-excel",
   "kit-carrousels-instagram-canva",
   "preset-lightroom-urbain",
+];
+
+/**
+ * Composition du hero : une ressource mise en avant et quatre satellites qui
+ * montrent l'étendue du catalogue. Les visuels restent sobres et fixes —
+ * aucune rotation ni animation permanente.
+ */
+const HERO_FEATURED_SLUG = "gestionnaire-de-taches-notion";
+const HERO_SATELLITES = [
+  "budget-personnel-excel",
+  "kit-carrousels-instagram-canva",
+  "preset-lightroom-urbain",
+  "cv-moderne-ats",
 ];
 
 const TRUST_ITEMS = [
@@ -95,33 +120,30 @@ const HOME_FAQ: FaqItem[] = [
   },
 ];
 
-function HeroShopCard({
+/** Couverture d'une ressource : vraie capture si disponible, sinon illustration. */
+function HeroThumb({
   product,
-  className,
+  className = "",
 }: {
-  product: ReturnType<typeof getDemoProduct>;
-  className: string;
+  product: DemoProduct;
+  className?: string;
 }) {
-  if (!product) return null;
-  return (
-    <figure className={`absolute z-10 ${className}`}>
-      <div className="overflow-hidden rounded-2xl border border-line bg-paper shadow-float transition-shadow duration-300">
-        <ProductVisual
-          accent={product.accent}
-          visual={product.visual}
-          label={product.category.name}
-          className="aspect-[4/3] w-full"
-        />
-        <figcaption className="flex items-center justify-between gap-2 px-4 py-3">
-          <span className="line-clamp-1 text-sm font-semibold text-ink">
-            {product.title}
-          </span>
-          <span className="shrink-0 text-sm font-bold text-ink">
-            {price(product.priceCents)}
-          </span>
-        </figcaption>
-      </div>
-    </figure>
+  const cover = getCoverImage(product);
+  return cover ? (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={cover.src}
+      alt={cover.alt}
+      loading="lazy"
+      decoding="async"
+      className={`object-cover ${className}`}
+    />
+  ) : (
+    <ProductVisual
+      visual={product.visual}
+      compact
+      className={`h-full w-full ${className}`}
+    />
   );
 }
 
@@ -129,9 +151,16 @@ export default function HomePage() {
   const selection = SELECTION_SLUGS.map(getDemoProduct).filter(
     (p): p is NonNullable<typeof p> => Boolean(p)
   );
-  const news = DEMO_PRODUCTS.filter((p) => p.isNew);
+  const news = isNewProducts;
   const counts = Object.fromEntries(
-    PRODUCT_CATEGORIES.map((c) => [c.slug, DEMO_PRODUCTS.filter((p) => p.category.slug === c.slug).length])
+    PRODUCT_CATEGORIES.map(
+      (c) =>
+        [c.slug, DEMO_PRODUCTS.filter((p) => p.category.slug === c.slug).length]
+    )
+  );
+  const featured = getDemoProduct(HERO_FEATURED_SLUG);
+  const satellites = HERO_SATELLITES.map(getDemoProduct).filter(
+    (p): p is NonNullable<typeof p> => Boolean(p)
   );
 
   return (
@@ -172,20 +201,63 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="relative mx-auto w-full max-w-[520px] lg:max-w-none">
-            <div className="relative aspect-[5/4]">
-              <HeroShopCard
-                product={getDemoProduct("budget-personnel-excel")}
-                className="left-0 top-0 z-20 w-[52%] rotate-3"
-              />
-              <HeroShopCard
-                product={getDemoProduct("gestionnaire-de-taches-notion")}
-                className="inset-x-0 top-4 z-30 mx-auto w-[68%] -rotate-2"
-              />
-              <HeroShopCard
-                product={getDemoProduct("kit-carrousels-instagram-canva")}
-                className="bottom-0 left-[8%] z-10 w-[62%] rotate-2"
-              />
+          {/* Composition catalogue : 1 ressource mise en avant + 4 satellites. */}
+          <div className="relative mx-auto w-full max-w-[560px] lg:max-w-none">
+            <div className="rounded-3xl border border-line bg-paper-2 p-5 sm:p-7">
+              <div className="flex items-center justify-between gap-4">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-ink-3">
+                  Sélection du moment
+                </p>
+                <Link
+                  href="/produits"
+                  className="-mr-2 inline-flex items-center rounded-lg px-2 py-1.5 text-xs font-semibold text-ink transition-colors hover:text-clay"
+                >
+                  Voir les 12
+                </Link>
+              </div>
+
+              {featured && (
+                <Link
+                  href={`/produits/${featured.slug}`}
+                  className="group mt-4 block overflow-hidden rounded-2xl border border-line bg-paper shadow-card transition-[border-color,box-shadow] duration-200 hover:border-line-strong hover:shadow-card-hover"
+                >
+                  <HeroThumb product={featured} className="aspect-[16/9] w-full" />
+                  <div className="flex flex-wrap items-start justify-between gap-3 px-5 py-4">
+                    <div className="min-w-0">
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-clay">
+                        {featured.category.name}
+                      </p>
+                      <p className="mt-1 truncate text-base font-bold tracking-tight text-ink">
+                        {featured.title}
+                      </p>
+                    </div>
+                    <p className="shrink-0 text-lg font-extrabold tracking-tight text-ink">
+                      {price(featured.priceCents)}
+                    </p>
+                  </div>
+                </Link>
+              )}
+
+              <ul className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+                {satellites.map((product) => (
+                  <li key={product.id}>
+                    <Link
+                      href={`/produits/${product.slug}`}
+                      className="group block overflow-hidden rounded-xl border border-line bg-paper transition-[border-color] duration-200 hover:border-line-strong"
+                    >
+                      <HeroThumb product={product} className="aspect-[4/3] w-full" />
+                      <span className="block px-3 py-2.5">
+                        <span className="line-clamp-2 block text-[12px] font-semibold leading-snug text-ink">
+                          {product.title}
+                        </span>
+                        <span className="mt-1 block text-[12px] font-bold text-clay">
+                          {price(product.priceCents)}
+                        </span>
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
         </div>

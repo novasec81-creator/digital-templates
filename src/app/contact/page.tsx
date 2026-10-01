@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { ContactForm } from "@/components/contact/ContactForm";
-import { CONTACT } from "@/lib/constants";
+import { canonicalPath, CONTACT } from "@/lib/constants";
 
 export const metadata: Metadata = {
   title: "Contact",
   description:
     "Passez commande ou posez vos questions : chaque message est traité directement par email.",
+  alternates: { canonical: canonicalPath("/contact") },
 };
 
 export default function ContactPage() {

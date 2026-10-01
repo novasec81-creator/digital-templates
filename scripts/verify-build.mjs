@@ -194,6 +194,182 @@ console.log(`[verify] Liens internes vérifiés : ${checked}${broken ? ` — ${b
 }
 
 // ---------------------------------------------------------------------------
+// 7. Canonical sur toutes les pages indexables
+//
+// `metadataBase` seul ne génère pas de `canonical` : chaque page doit le
+// déclarer. Sans ce contrôle, les variantes de filtres du catalogue
+// (/produits?q=…, /produits?categorie=…) restent indexables comme doublons.
+// ---------------------------------------------------------------------------
+{
+  // Pages indexables et canonical attendu (chemin interne).
+  const expectedCanonicals = {
+    "index.html": "/",
+    "produits.html": "/produits",
+    "a-propos.html": "/a-propos",
+    "contact.html": "/contact",
+    "faq.html": "/faq",
+    "mentions-legales.html": "/mentions-legales",
+    "cgv.html": "/cgv",
+    "confidentialite.html": "/confidentialite",
+  };
+  for (const p of products) expectedCanonicals[p] = `/${p.replace(/\.html$/, "")}`;
+
+  let ok = 0;
+  for (const [file, expectedPath] of Object.entries(expectedCanonicals)) {
+    const full = join(out, file);
+    if (!existsSync(full)) continue; // l'absence est déjà signalée plus haut
+    const html = readFileSync(full, "utf8");
+    const tag = html.match(/<link[^>]+rel="canonical"[^>]*>/i)?.[0];
+    if (!tag) {
+      fail("canonical", `<link rel="canonical"> absent de ${file}`);
+      continue;
+    }
+    const href = tag.match(/href="([^"]+)"/i)?.[1];
+    if (!href) {
+      fail("canonical", `canonical sans href dans ${file}`);
+      continue;
+    }
+    // Comparaison sur le chemin normalisé : l'accueil canonique est
+    // l'URL du site sans slash final, ce qui est la forme émise.
+    const hrefPath = href.replace(/^https?:\/\/[^/]+/, "").replace(/\/+$/, "") || "/";
+    const expectedNormalized = expectedPath.replace(/\/+$/, "") || "/";
+    if (hrefPath !== expectedNormalized) {
+      fail("canonical", `${file} pointe vers « ${href} » au lieu de « …${expectedNormalized} »`);
+      continue;
+    }
+    if (/localhost/i.test(href)) {
+      fail("canonical", `${file} utilise une URL locale : ${href}`);
+      continue;
+    }
+    ok++;
+  }
+  if (ok > 0) {
+    console.log(`[verify] Canonical vérifiés : ${ok}/${Object.keys(expectedCanonicals).length} pages indexables.`);
+  }
+
+  // La page 404 ne doit jamais être indexée ni canonisée.
+  if (existsSync(join(out, "404.html"))) {
+    const html = readFileSync(join(out, "404.html"), "utf8");
+    if (!/name="robots"[^>]*content="[^"]*noindex/i.test(html)) {
+      fail("404", "404.html ne déclare pas « noindex »");
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 8. Images : alt obligatoire, aucun placeholder non résolu
+// ---------------------------------------------------------------------------
+{
+  const PLACEHOLDER_HINTS = [
+    "format-templates.example",
+    "placeholder.com",
+    "via.placeholder",
+    "placehold.co",
+    "/images/example",
+  ];
+  let imgTotal = 0;
+  let imgBroken = 0;
+
+  for (const file of htmlFiles) {
+    const html = readFileSync(file, "utf8");
+    for (const tag of html.match(/<img\b[^>]*>/gi) ?? []) {
+      imgTotal++;
+
+      const alt = tag.match(/\salt="([^"]*)"/i)?.[1];
+      if (alt === undefined) {
+        fail("image", `<img> sans attribut alt dans ${rel(file)}`);
+        continue;
+      }
+      if (alt.trim() === "") {
+        // alt vide uniquement acceptable si l'image est explicitement décorative.
+        const ariaHidden = /\saria-hidden="true"/i.test(tag);
+        if (!ariaHidden) {
+          fail("image", `<img alt=""> sans aria-hidden dans ${rel(file)}`);
+        }
+      }
+
+      for (const hint of PLACEHOLDER_HINTS) {
+        if (tag.includes(hint)) {
+          fail("image", `placeholder « ${hint} » non résolu dans ${rel(file)}`);
+        }
+      }
+
+      // Le fichier référencé doit exister réellement dans le build.
+      const src = tag.match(/\ssrc="([^"]+)"/i)?.[1];
+      if (src && !/^(https?:|data:|blob:)/i.test(src)) {
+        const clean = src.split(/[?#]/)[0];
+        if (clean && !existsSync(join(out, clean))) {
+          imgBroken++;
+          fail("image", `fichier absent « ${src} » référencé dans ${rel(file)}`);
+        }
+      }
+    }
+  }
+  if (imgTotal === 0) {
+    console.log("[verify] Aucune <img> dans le build (visuels illustratifs en SVG) — contrôle alt sans objet.");
+  } else {
+    console.log(`[verify] Images vérifiées : ${imgTotal} balise(s)${imgBroken ? ` — ${imgBroken} fichier(s) manquant(s)` : ""}.`);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 9. Accessibilité : un seul <h1> par page, langue de document
+// ---------------------------------------------------------------------------
+{
+  for (const file of htmlFiles) {
+    const html = readFileSync(file, "utf8");
+    const h1 = (html.match(/<h1\b/gi) ?? []).length;
+    if (h1 === 0) {
+      fail("titres", `aucun <h1> dans ${rel(file)}`);
+    } else if (h1 > 1) {
+      fail("titres", `${h1} <h1> dans ${rel(file)} (un seul attendu)`);
+    }
+  }
+  const home = join(out, "index.html");
+  if (existsSync(home)) {
+    const html = readFileSync(home, "utf8");
+    if (!/<html[^>]+lang="fr"/i.test(html)) {
+      fail("langue", "index.html ne déclare pas lang=\"fr\"");
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 10. Liens d'ancrage internes : #<id> doit exister dans la page cible
+// ---------------------------------------------------------------------------
+{
+  let anchors = 0;
+  let brokenAnchors = 0;
+  const idCache = new Map();
+
+  const idsOf = (file) => {
+    if (idCache.has(file)) return idCache.get(file);
+    const html = readFileSync(file, "utf8");
+    const ids = new Set(
+      [...html.matchAll(/\sid="([^"]+)"/g)].map((m) => m[1])
+    );
+    idCache.set(file, ids);
+    return ids;
+  };
+
+  for (const file of htmlFiles) {
+    const html = readFileSync(file, "utf8");
+    for (const m of html.matchAll(/href="(#[^"]+)"/g)) {
+      const id = m[1].slice(1);
+      if (!id) continue;
+      anchors++;
+      if (!idsOf(file).has(id)) {
+        brokenAnchors++;
+        fail("ancre", `« ${m[1]} » sans cible dans ${rel(file)}`);
+      }
+    }
+  }
+  if (anchors > 0) {
+    console.log(`[verify] Ancres internes vérifiées : ${anchors}${brokenAnchors ? ` — ${brokenAnchors} sans cible` : ""}`);
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Bilan
 // ---------------------------------------------------------------------------
 if (errors.length > 0) {

@@ -6,12 +6,21 @@ import {
   type DemoBundle,
 } from "@/lib/demo-data";
 import { price } from "@/lib/constants";
+import { bundleOrderHref } from "@/lib/purchase";
 
 /**
- * Carte dédiée aux packs : différente d'une carte produit classique,
- * avec liste des ressources incluses et économie calculée.
+ * Carte dédiée aux packs : liste des ressources incluses, prix séparé réel
+ * (somme des produits du catalogue) et économie calculée, sans pourcentage
+ * marketing. Le lien de commande vient du module centralisé `purchase.ts`.
  */
-export function BundleCard({ bundle }: { bundle: DemoBundle }) {
+export function BundleCard({
+  bundle,
+  showMembers = true,
+}: {
+  bundle: DemoBundle;
+  /** `false` pour les versions compactes (grilles serrées). */
+  showMembers?: boolean;
+}) {
   const members = resolveBundleMembers(bundle);
   const separateTotal = bundleSeparateTotal(bundle);
   const savings = separateTotal - bundle.packPriceCents;
@@ -32,36 +41,43 @@ export function BundleCard({ bundle }: { bundle: DemoBundle }) {
       </h3>
       <p className="mt-1 text-[13px] text-ink-2">{bundle.tagline}</p>
 
-      <ul className="mt-5 space-y-2.5">
-        {members.map((m) => (
-          <li key={m.id} className="flex items-center gap-2.5 text-sm text-ink-2">
-            <Check className="h-4 w-4 shrink-0 text-clay" aria-hidden="true" />
-            <span className="line-clamp-1">
-              {m.title}
-              {m.category.slug && (
+      {showMembers && (
+        <ul className="mt-5 space-y-2.5">
+          {members.map((m) => (
+            <li key={m.id} className="flex items-center gap-2.5 text-sm text-ink-2">
+              <Check className="h-4 w-4 shrink-0 text-clay" aria-hidden="true" />
+              <span className="line-clamp-1">
+                <Link
+                  href={`/produits/${m.slug}`}
+                  className="transition-colors hover:text-clay"
+                >
+                  {m.title}
+                </Link>
                 <span className="text-ink-3"> · {m.category.name}</span>
-              )}
-            </span>
-          </li>
-        ))}
-      </ul>
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
 
       <div className="mt-6 flex items-end justify-between gap-3 border-t border-line pt-5">
         <div>
           <p className="text-xs text-ink-3">
-            Séparé : <span className="line-through">{price(separateTotal)}</span>
+            {members.length} ressources séparément :{" "}
+            <span className="line-through">{price(separateTotal)}</span>
           </p>
           <p className="mt-1 text-2xl font-extrabold tracking-tight text-ink">
             {price(bundle.packPriceCents)}
           </p>
           {savings > 0 && (
             <p className="mt-1 text-xs font-semibold text-clay">
-              Économisez {price(savings)}
+              Économie de {price(savings)}
             </p>
           )}
         </div>
         <Link
-          href={`/contact?pack=${bundle.id}`}
+          href={bundleOrderHref(bundle)}
+          aria-label={`Commander le pack ${bundle.title} — ${price(bundle.packPriceCents)}`}
           className="inline-flex shrink-0 items-center gap-1.5 rounded-xl bg-ink px-4 py-2.5 text-sm font-semibold text-paper transition-colors hover:bg-black"
         >
           Commander

@@ -2,12 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { FaqAccordion, type FaqItem } from "@/components/ui/FaqAccordion";
-import { CONTACT, DELIVERY, STORE_NAME } from "@/lib/constants";
+import { canonicalPath, CONTACT, DELIVERY, STORE_NAME } from "@/lib/constants";
 
 export const metadata: Metadata = {
   title: "FAQ",
   description:
     "Questions fréquentes sur les templates : fonctionnement, commande, livraison, personnalisation, support et licences.",
+  alternates: { canonical: canonicalPath("/faq") },
 };
 
 const GENERAL: FaqItem[] = [

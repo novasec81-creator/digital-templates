@@ -46,7 +46,7 @@ export function SectionHeader({
       {linkHref && linkLabel && (
         <Link
           href={linkHref}
-          className="group inline-flex shrink-0 items-center gap-1.5 text-sm font-semibold text-ink transition-colors hover:text-clay"
+          className="group inline-flex shrink-0 items-center gap-1.5 rounded-lg py-1.5 text-sm font-semibold text-ink transition-colors hover:text-clay"
         >
           {linkLabel}
           <ArrowRight

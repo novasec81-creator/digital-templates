@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
-import { ANALYTICS_CONFIGURED, CONTACT, STORE_LEGAL, STORE_NAME } from "@/lib/constants";
+import { ANALYTICS_CONFIGURED, canonicalPath, CONTACT, STORE_LEGAL, STORE_NAME } from "@/lib/constants";
 
-export const metadata: Metadata = { title: "Politique de confidentialité" };
+export const metadata: Metadata = {
+  title: "Politique de confidentialité",
+  description: `Politique de confidentialité de ${STORE_NAME} : données collectées, durée de conservation et exercice des droits RGPD.`,
+  alternates: { canonical: canonicalPath("/confidentialite") },
+};
 
 export const dynamic = "force-static";
 

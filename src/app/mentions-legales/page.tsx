@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
-import { requireSiteUrl, STORE_LEGAL, STORE_NAME } from "@/lib/constants";
+import { canonicalPath, requireSiteUrl, STORE_LEGAL, STORE_NAME } from "@/lib/constants";
 
-export const metadata: Metadata = { title: "Mentions légales" };
+export const metadata: Metadata = {
+  title: "Mentions légales",
+  description: `Mentions légales de ${STORE_NAME} : éditeur, hébergeur et conditions d'utilisation du site.`,
+  alternates: { canonical: canonicalPath("/mentions-legales") },
+};
 
 export const dynamic = "force-static";
 

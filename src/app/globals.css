@@ -3,16 +3,22 @@
 @theme {
   --font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
 
-  /* Palette "Format" : encre (primaire), papier (fonds), argile (accent discret). */
+  /* Palette "Format" : encre (primaire), papier (fonds), argile (accent discret).
+     Contrastes vérifiés sur blanc ET sur paper-2/paper-3 :
+   - ink-3  (#5f6874) : 5,66:1 sur blanc, 4,84:1 sur paper-3 (AA à 4,5:1) ;
+   - clay   (#8a4f24) : 6,46:1 sur blanc, 5,45:1 sur clay-soft (AA) ;
+   - ink-2  (#474f5a) : 9,06:1 sur blanc.
+     Ces valeurs sont volontairement plus sombres que l'ancien #78818e / #9a5c2e,
+     qui tombaient à 3,9:1 et échouaient AA sur les petits textes. */
   --color-ink: #1f242b;
   --color-ink-2: #474f5a;
-  --color-ink-3: #78818e;
+  --color-ink-3: #5f6874;
   --color-paper: #ffffff;
   --color-paper-2: #f7f6f3;
   --color-paper-3: #efede7;
   --color-line: #e6e1d7;
   --color-line-strong: #d5cec0;
-  --color-clay: #9a5c2e;
+  --color-clay: #8a4f24;
   --color-clay-soft: #f3eae1;
 
   --shadow-card:
@@ -35,7 +41,7 @@
   }
 
   ::selection {
-    background-color: rgb(154 92 46 / 0.16);
+    background-color: rgb(138 79 36 / 0.16);
   }
 
   /* Ancres internes : ne pas masquer le header collant. */

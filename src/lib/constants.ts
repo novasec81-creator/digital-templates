@@ -45,6 +45,19 @@ export function requireSiteUrl(source: string): string {
 }
 
 /**
+ * Construit l'URL canonique absolue d'une page à partir de son chemin interne.
+ * Utilisé par le `canonical` explicite de chaque page indexable : sans cela,
+ * les variantes de recherche et de filtres peuvent être indexées comme doublons.
+ *
+ * @param pathname Chemin interne commençant par `/`, ou `/` pour l'accueil.
+ */
+export function canonicalPath(pathname: string): string {
+  const base = requireSiteUrl("canonical");
+  const clean = pathname.replace(/^\/+|\/+$/g, "");
+  return clean ? `${base}/${clean}` : base;
+}
+
+/**
  * Un outil de mesure d'audience est-il configuré (GTM / GA4 / Clarity) ?
  * Déterminé au build ; contrôle l'affichage du bandeau cookies et la
  * politique de confidentialité afin que le site ne décrive que ce qu'il fait.

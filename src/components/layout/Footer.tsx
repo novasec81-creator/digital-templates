@@ -28,7 +28,7 @@ export function Footer() {
           <p className="text-sm font-bold text-ink">Découvrir</p>
           <ul className="mt-4 space-y-2.5">
             <li>
-              <Link href="/produits" className="text-sm text-ink-2 transition-colors hover:text-ink">
+              <Link href="/produits" className="inline-block py-1 text-sm text-ink-2 transition-colors hover:text-ink">
                 Tous les templates
               </Link>
             </li>
@@ -36,7 +36,7 @@ export function Footer() {
               <li key={c.slug}>
                 <Link
                   href={`/produits?categorie=${c.slug}`}
-                  className="text-sm text-ink-2 transition-colors hover:text-ink"
+                  className="inline-block py-1 text-sm text-ink-2 transition-colors hover:text-ink"
                 >
                   {c.name}
                   <span className="ml-1.5 text-xs text-ink-3">
@@ -52,24 +52,24 @@ export function Footer() {
           <p className="text-sm font-bold text-ink">Aide</p>
           <ul className="mt-4 space-y-2.5">
             <li>
-              <Link href="/contact" className="text-sm text-ink-2 transition-colors hover:text-ink">
+              <Link href="/contact" className="inline-block py-1 text-sm text-ink-2 transition-colors hover:text-ink">
                 Contact
               </Link>
             </li>
             <li>
-              <Link href="/faq" className="text-sm text-ink-2 transition-colors hover:text-ink">
+              <Link href="/faq" className="inline-block py-1 text-sm text-ink-2 transition-colors hover:text-ink">
                 FAQ
               </Link>
             </li>
             <li>
-              <Link href="/a-propos" className="text-sm text-ink-2 transition-colors hover:text-ink">
+              <Link href="/a-propos" className="inline-block py-1 text-sm text-ink-2 transition-colors hover:text-ink">
                 À propos
               </Link>
             </li>
             <li>
               <Link
                 href="/#fonctionnement"
-                className="text-sm text-ink-2 transition-colors hover:text-ink"
+                className="inline-block py-1 text-sm text-ink-2 transition-colors hover:text-ink"
               >
                 Comment ça marche
               </Link>
@@ -83,20 +83,20 @@ export function Footer() {
             <li>
               <Link
                 href="/mentions-legales"
-                className="text-sm text-ink-2 transition-colors hover:text-ink"
+                className="inline-block py-1 text-sm text-ink-2 transition-colors hover:text-ink"
               >
                 Mentions légales
               </Link>
             </li>
             <li>
-              <Link href="/cgv" className="text-sm text-ink-2 transition-colors hover:text-ink">
+              <Link href="/cgv" className="inline-block py-1 text-sm text-ink-2 transition-colors hover:text-ink">
                 Conditions générales de vente
               </Link>
             </li>
             <li>
               <Link
                 href="/confidentialite"
-                className="text-sm text-ink-2 transition-colors hover:text-ink"
+                className="inline-block py-1 text-sm text-ink-2 transition-colors hover:text-ink"
               >
                 Politique de confidentialité
               </Link>
